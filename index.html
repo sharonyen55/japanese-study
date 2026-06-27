@@ -1649,7 +1649,11 @@ function renderHeader(s) {
   const yw = document.getElementById('yt-wrap');
   if (s.youtube) {
     yw.style.display = 'block';
-    loadYouTubePlayer(s.youtube);
+    const fb = document.getElementById('yt-fallback');
+    fb.href = `https://www.youtube.com/watch?v=${s.youtube}`;
+    document.getElementById('yt-thumb').src = `https://img.youtube.com/vi/${s.youtube}/mqdefault.jpg`;
+    fb.style.display = 'block';
+    document.getElementById('yt-player-box').style.display = 'none';
   } else {
     yw.style.display = 'none';
   }
