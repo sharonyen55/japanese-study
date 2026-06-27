@@ -1418,9 +1418,10 @@ const SONGS = [
 
 /* ── Furigana parser ── */
 function ruby(text) {
+  // base 只抓緊鄰括號前的「漢字」連續區段（含 々〆ヶ），避免把前面的平假名也吃進去
   return text
     .replace(/\\/g, '')
-    .replace(/([^\s(（【〔「」『』()）\[\]]+)\(([^()（）]+)\)/g,
+    .replace(/([㐀-鿿々〆ヶヵ]+)\(([^()（）]+)\)/g,
       (m, kanji, furi) => {
         if (/^[぀-ヿㇰ-ㇿ･-ﾟ]+$/.test(furi)) {
           return `<ruby>${kanji}<rt>${furi}</rt></ruby>`;
