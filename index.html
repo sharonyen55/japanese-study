@@ -192,14 +192,15 @@ rt{font-size:.62em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
         <div id="song-artist"></div>
         <div id="dist-bar"></div>
       </div>
-      <div id="yt-wrap" style="display:none">
-        <a id="yt-link" href="#" target="_blank" rel="noopener" style="display:block;position:relative;width:220px;flex-shrink:0;border-radius:8px;overflow:hidden;text-decoration:none">
-          <img id="yt-thumb" src="" width="220" style="display:block;border-radius:8px">
+      <div id="yt-wrap" style="display:none;width:260px;flex-shrink:0">
+        <div id="yt-player-box" style="border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/9"></div>
+        <a id="yt-fallback" href="#" target="_blank" rel="noopener" style="display:none;position:relative;border-radius:8px;overflow:hidden;text-decoration:none">
+          <img id="yt-thumb" src="" style="display:block;width:100%;border-radius:8px">
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);gap:6px">
             <div style="width:44px;height:44px;background:#ff0000;border-radius:50%;display:flex;align-items:center;justify-content:center">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><polygon points="9,7 19,12 9,17"/></svg>
             </div>
-            <span style="color:#fff;font-size:11px;font-weight:500;letter-spacing:.3px">在 YouTube 觀看</span>
+            <span style="color:#fff;font-size:11px;font-weight:500">無法嵌入・在 YouTube 觀看</span>
           </div>
         </a>
       </div>
@@ -1647,9 +1648,8 @@ function renderHeader(s) {
   ).join('');
   const yw = document.getElementById('yt-wrap');
   if (s.youtube) {
-    document.getElementById('yt-link').href = `https://www.youtube.com/watch?v=${s.youtube}`;
-    document.getElementById('yt-thumb').src = `https://img.youtube.com/vi/${s.youtube}/mqdefault.jpg`;
     yw.style.display = 'block';
+    loadYouTubePlayer(s.youtube);
   } else {
     yw.style.display = 'none';
   }
@@ -1711,6 +1711,50 @@ function selectSong(s) {
   renderGrammar(s);
   switchTab(curTab);
   renderSidebar();
+}
+
+/* ── YouTube IFrame API ── */
+var ytPlayer = null, ytReady = false, pendingVid = null;
+(function(){
+  var s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
+})();
+
+function onYouTubeIframeAPIReady() {
+  ytReady = true;
+  if (pendingVid) { _createPlayer(pendingVid); pendingVid = null; }
+}
+
+function loadYouTubePlayer(videoId) {
+  document.getElementById('yt-player-box').style.display = '';
+  document.getElementById('yt-fallback').style.display = 'none';
+  if (!ytReady) { pendingVid = videoId; return; }
+  if (ytPlayer) {
+    ytPlayer.loadVideoById(videoId);
+  } else {
+    _createPlayer(videoId);
+  }
+}
+
+function _createPlayer(videoId) {
+  document.getElementById('yt-player-box').innerHTML = '';
+  ytPlayer = new YT.Player('yt-player-box', {
+    width: '100%', height: '100%',
+    videoId: videoId,
+    playerVars: {rel: 0, modestbranding: 1},
+    events: {
+      onError: function(e) {
+        if (e.data === 101 || e.data === 150 || e.data === 100) {
+          document.getElementById('yt-player-box').style.display = 'none';
+          var fb = document.getElementById('yt-fallback');
+          fb.href = 'https://www.youtube.com/watch?v=' + videoId;
+          document.getElementById('yt-thumb').src = 'https://img.youtube.com/vi/' + videoId + '/mqdefault.jpg';
+          fb.style.display = 'block';
+        }
+      }
+    }
+  });
 }
 
 /* ── Init ── */
