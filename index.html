@@ -65,7 +65,7 @@ body{font-family:'Segoe UI','Noto Sans TC',sans-serif;background:var(--bg);color
 #lyrics-view{flex:1;overflow-y:auto;padding:24px 28px;display:none}
 #lyrics-view.show{display:block}
 ruby{ruby-align:center}
-rt{font-size:.62em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
+rt{font-size:.6em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
 .lyric-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
 .lyric-block:last-child{border-bottom:none}
 .lyric-ja{font-size:16px;line-height:2.2;font-family:'Noto Sans JP','Noto Sans TC',sans-serif;color:var(--text)}
@@ -82,8 +82,10 @@ rt{font-size:.62em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
 .g-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .g-pattern{font-size:17px;font-weight:600;color:var(--accent);font-family:'Noto Sans JP',sans-serif;line-height:1.3}
 .g-badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;margin-left:8px;flex-shrink:0}
-.g-example{font-size:13px;line-height:1.7;background:rgba(255,255,255,.04);border-radius:5px;padding:7px 11px;margin-bottom:9px;border-left:3px solid var(--accent);font-family:'Noto Sans JP',sans-serif}
+.g-example{font-size:13px;line-height:2.6;background:rgba(255,255,255,.04);border-radius:5px;padding:10px 11px 7px;margin-bottom:6px;border-left:3px solid var(--accent);font-family:'Noto Sans JP',sans-serif}
 .g-card.learned .g-example{border-left-color:var(--green-b)}
+.g-example-zh{font-size:11px;color:var(--sub);padding:0 11px 7px;margin-bottom:6px;line-height:1.5}
+.gram-hi{color:#f0a060;font-weight:700}
 .g-meaning{font-size:12px;color:var(--sub);line-height:1.6}
 .g-check{position:absolute;bottom:12px;right:14px;font-size:11px;color:var(--sub);display:flex;align-items:center;gap:3px;opacity:.55}
 .g-card.learned .g-check{color:var(--n5);opacity:1}
@@ -1322,110 +1324,108 @@ LR[13] = `まだ見(み)てて
 /* ── Song metadata + grammar ── */
 const SONGS = [
   {id:1,title:"BLACK SHOUT",artist:"Roselia",group:"BanG Dream!",youtube:"7DTKwnWHFQE",note:"團體劇情第一章（Roselia 結成）",level:"N4",distribution:{N5:30,N4:35,N3:25,N2:8,N1:2},grammar:[
-    {id:"g1",pattern:"〜ている",example:"私(わたし)は此処(ここ)に今(いま) 生(い)きているから",meaning:"持續狀態（現在正在...）",level:"N5",learned:false},
-    {id:"g2",pattern:"〜でもいい",example:"黒(くろ)でもいい",meaning:"就算是...也沒關係",level:"N5",learned:false},
-    {id:"g3",pattern:"〜たい",example:"叶(かな)えたい夢(ゆめ) 勝(か)ち取(と)れ今(いま)すぐに",meaning:"想要（做某事）",level:"N5",learned:false},
-    {id:"g4",pattern:"〜んだ",example:"自分(じぶん)の手(て)で 切(き)り開(ひら)くんだ",meaning:"強調語氣（表達決心）",level:"N4",learned:false},
-    {id:"g5",pattern:"〜ずに",example:"迷(まよ)わず進(すす)もう",meaning:"不...地（做另一件事）",level:"N3",learned:false}
+    {id:"g1",pattern:"〜ている",example:"私(わたし)は此処(ここ)に今(いま) 生(い)きているから",exampleZh:"因為我現在活著、就在這裡",meaning:"持續狀態（現在正在...）",level:"N5",learned:false},
+    {id:"g2",pattern:"〜でもいい",example:"黒(くろ)でもいい",exampleZh:"就算是黑色也沒關係",meaning:"就算是...也沒關係",level:"N5",learned:false},
+    {id:"g3",pattern:"〜たい",example:"叶(かな)えたい夢(ゆめ) 勝(か)ち取(と)れ今(いま)すぐに",exampleZh:"想要實現的夢，現在就去奪取吧",meaning:"想要（做某事）",level:"N5",learned:false},
+    {id:"g4",pattern:"〜んだ",example:"自分(じぶん)の手(て)で 切(き)り開(ひら)くんだ",exampleZh:"要用自己的手開拓出去",meaning:"強調語氣（表達決心）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜ずに",example:"迷(まよ)わず進(すす)もう",exampleZh:"毫不猶豫地前進吧",meaning:"不...地（做另一件事）",level:"N3",learned:false}
   ]},
   {id:2,title:"LOUDER",artist:"Roselia",group:"BanG Dream!",youtube:"gZqpgrL6JTI",note:"活動「思緒相連、未完成之歌」（友希那與父親的羈絆）",level:"N3",distribution:{N5:28,N4:33,N3:27,N2:10,N1:2},grammar:[
-    {id:"g1",pattern:"〜たいの",example:"私(わたし)の音(おと)で try to... 伝(つた)えたいの",meaning:"想要...（の 帶說明或女性語氣）",level:"N5",learned:false},
-    {id:"g2",pattern:"〜てゆく／〜ていく",example:"輝(かがや)き溢(あふ)れゆくあなたの音(おと)は",meaning:"持續進行／逐漸...",level:"N4",learned:false},
-    {id:"g3",pattern:"〜なんて",example:"歌(うた)う資格(しかく)なんてないと背(せ)を向(む)けて",meaning:"竟然...（帶輕視或驚訝語氣）",level:"N3",learned:false},
-    {id:"g4",pattern:"〜ように",example:"守(まも)るように 固(かた)く結(むす)び",meaning:"像是...般（比喻方式）",level:"N3",learned:false},
-    {id:"g5",pattern:"〜ばいい",example:"脆(もろ)さは砕(くだ)ければいい",meaning:"只要...就好了",level:"N4",learned:false}
+    {id:"g1",pattern:"〜たいの",example:"私(わたし)の音(おと)で try to... 伝(つた)えたいの",exampleZh:"想要用我的聲音傳達...",meaning:"想要...（の 帶說明或女性語氣）",level:"N5",learned:false},
+    {id:"g2",pattern:"〜てゆく／〜ていく",example:"輝(かがや)き溢(あふ)れゆくあなたの音(おと)は",exampleZh:"你那溢滿光輝、漸漸流逝的聲音",meaning:"持續進行／逐漸...",level:"N4",learned:false},
+    {id:"g3",pattern:"〜なんて",example:"歌(うた)う資格(しかく)なんてないと背(せ)を向(む)けて",exampleZh:"覺得自己根本沒有資格歌唱，轉身背對",meaning:"竟然...（帶輕視或驚訝語氣）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜ように",example:"守(まも)るように 固(かた)く結(むす)び",exampleZh:"如同守護般、緊緊相繫",meaning:"像是...般（比喻方式）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜ばいい",example:"脆(もろ)さは砕(くだ)ければいい",exampleZh:"脆弱就讓它碎裂好了",meaning:"只要...就好了",level:"N4",learned:false}
   ]},
   {id:3,title:"Re:birth day",artist:"Roselia",group:"BanG Dream!",youtube:"cqY4sBLd-_E",note:"象徵 Roselia 成員間建立信任，如同重生",level:"N3",distribution:{N5:25,N4:30,N3:28,N2:12,N1:5},grammar:[
-    {id:"g1",pattern:"〜そうな",example:"崩(くず)れそうな身体(からだ)を包(つつ)んで癒(い)した",meaning:"看起來快要...（樣態助動詞）",level:"N4",learned:false},
-    {id:"g2",pattern:"〜ても",example:"苦(くる)しくても 信(しん)じてるわ",meaning:"就算...也（逆接條件）",level:"N4",learned:false},
-    {id:"g3",pattern:"〜ずに",example:"気持(きも)ちには向(む)き合(あ)わずに 弱(よわ)さを選(えら)び",meaning:"不...地（做另一件事）",level:"N3",learned:false},
-    {id:"g4",pattern:"〜てゆく",example:"突(つ)き進(すす)んでゆくと 決(き)めた",meaning:"持續前進（動作持續延伸）",level:"N4",learned:false},
-    {id:"g5",pattern:"〜ているから",example:"信(しん)じているわ",meaning:"因為一直相信著（持續狀態＋原因）",level:"N5",learned:false}
+    {id:"g1",pattern:"〜そうな",example:"崩(くず)れそうな身体(からだ)を包(つつ)んで癒(い)した",exampleZh:"將看似快要崩潰的身體包裹起來、療癒著",meaning:"看起來快要...（樣態助動詞）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜ても",example:"苦(くる)しくても 信(しん)じてるわ",exampleZh:"就算再苦，我也相信著",meaning:"就算...也（逆接條件）",level:"N4",learned:false},
+    {id:"g3",pattern:"〜ずに",example:"気持(きも)ちには向(む)き合(あ)わずに 弱(よわ)さを選(えら)び",exampleZh:"沒有正視自己的感受，選擇了軟弱",meaning:"不...地（做另一件事）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜てゆく",example:"突(つ)き進(すす)んでゆくと 決(き)めた",exampleZh:"決定要一路衝破向前",meaning:"持續前進（動作持續延伸）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜ているから",example:"信(しん)じているわ",exampleZh:"我一直相信著",meaning:"因為一直相信著（持續狀態＋原因）",level:"N5",learned:false}
   ]},
   {id:4,title:"陽だまりロードナイト",artist:"Roselia",group:"BanG Dream!",youtube:"NCE8lemg38g",note:"活動「Don't leave me, Lisa!!!!」（莉莎的主場）",level:"N4",distribution:{N5:33,N4:37,N3:22,N2:6,N1:2},grammar:[
-    {id:"g1",pattern:"〜ても",example:"心(こころ)が悴(かじか)んでも「大丈夫(だいじょうぶ)」と言葉(ことば)でいつも抱(だ)きしめた",meaning:"就算...也（逆接條件）",level:"N4",learned:false},
-    {id:"g2",pattern:"〜となって",example:"声(こえ)となって 表情(ひょうじょう)となって 導(みちび)いてく",meaning:"化作...、成為...（變化後的狀態）",level:"N4",learned:false},
-    {id:"g3",pattern:"〜てくれた",example:"初(はじ)めての気持(きも)ちを 教(おし)えてくれた",meaning:"為我...（別人為說話者做某事）",level:"N4",learned:false},
-    {id:"g4",pattern:"〜ように",example:"励(はげ)ます魔法(まほう)のように 囁(ささや)いたの",meaning:"像是...般（比喻方式）",level:"N3",learned:false},
-    {id:"g5",pattern:"〜ていても",example:"離(はな)れていても 帰(かえ)る場所(ばしょ)がある",meaning:"就算（持續）...也依然...",level:"N4",learned:false}
+    {id:"g1",pattern:"〜ても",example:"心(こころ)が悴(かじか)んでも「大丈夫(だいじょうぶ)」と言葉(ことば)でいつも抱(だ)きしめた",exampleZh:"就算心裡凍僵了，也總是用「沒事的」這句話緊緊擁抱",meaning:"就算...也（逆接條件）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜となって",example:"声(こえ)となって 表情(ひょうじょう)となって 導(みちび)いてく",exampleZh:"化作聲音、化作表情，引領著前行",meaning:"化作...、成為...（變化後的狀態）",level:"N4",learned:false},
+    {id:"g3",pattern:"〜てくれた",example:"初(はじ)めての気持(きも)ちを 教(おし)えてくれた",exampleZh:"讓我認識了初次體驗到的感受",meaning:"為我...（別人為說話者做某事）",level:"N4",learned:false},
+    {id:"g4",pattern:"〜ように",example:"励(はげ)ます魔法(まほう)のように 囁(ささや)いたの",exampleZh:"像施了鼓勵的魔法般，輕聲低語著",meaning:"像是...般（比喻方式）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜ていても",example:"離(はな)れていても 帰(かえ)る場所(ばしょ)がある",exampleZh:"就算分隔兩地，也有可以回去的地方",meaning:"就算（持續）...也依然...",level:"N4",learned:false}
   ]},
   {id:5,title:"熱色スターマイン",artist:"Roselia",group:"BanG Dream!",youtube:"DZNOUNsvWps",note:"活動「貫穿黑暗、青之星」（夏季煙火大會的熱情）",level:"N3",distribution:{N5:27,N4:33,N3:28,N2:9,N1:3},grammar:[
-    {id:"g1",pattern:"〜れば〜",example:"優(やさ)しさでなぞれば生(う)まれた",meaning:"如果...就會...（假定條件）",level:"N4",learned:false},
-    {id:"g2",pattern:"〜ほどに",example:"目(め)が眩(くら)むほどに強(つよ)く",meaning:"到...的程度地",level:"N3",learned:false},
-    {id:"g3",pattern:"〜に乗り",example:"潮風(しおかぜ)に乗(の)り 言霊(ことだま)はやがて嵐(あらし)へと",meaning:"乘著...（搭載於某種力量）",level:"N3",learned:false},
-    {id:"g4",pattern:"〜なんて",example:"不可能(ふかのう)なんてないわ",meaning:"什麼...之類的（帶否定或輕視語氣）",level:"N3",learned:false},
-    {id:"g5",pattern:"〜よう",example:"熱帯夜(ねったいや) 泳(およ)ぐよう瞬(まばた)く",meaning:"如同...般（比喻樣態）",level:"N3",learned:false}
+    {id:"g1",pattern:"〜れば〜",example:"優(やさ)しさでなぞれば生(う)まれた",exampleZh:"只要用溫柔描繪，便會誕生",meaning:"如果...就會...（假定條件）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜ほどに",example:"目(め)が眩(くら)むほどに強(つよ)く",exampleZh:"強烈到讓眼睛都花了",meaning:"到...的程度地",level:"N3",learned:false},
+    {id:"g3",pattern:"〜に乗り",example:"潮風(しおかぜ)に乗(の)り 言霊(ことだま)はやがて嵐(あらし)へと",exampleZh:"乘著海風，言靈終將化作暴風",meaning:"乘著...（搭載於某種力量）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜なんて",example:"不可能(ふかのう)なんてないわ",exampleZh:"根本沒有什麼不可能",meaning:"什麼...之類的（帶否定或輕視語氣）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜よう",example:"熱帯夜(ねったいや) 泳(およ)ぐよう瞬(まばた)く",exampleZh:"炎熱的夜晚，如同游泳般閃爍著",meaning:"如同...般（比喻樣態）",level:"N3",learned:false}
   ]},
   {id:6,title:"ONENESS",artist:"Roselia",group:"BanG Dream!",youtube:"m3mZynIlQe0",note:"活動「秋時雨中撐起的一把傘」（五人一心的開端）",level:"N3",distribution:{N5:25,N4:32,N3:28,N2:11,N1:4},grammar:[
-    {id:"g1",pattern:"〜のは",example:"孤独(こどく)を捨(す)てて掴(つか)むのは 出会(であ)う夢(ゆめ) 愛(あい)",meaning:"...的（東西）是...（名詞化後接主題）",level:"N4",learned:false},
-    {id:"g2",pattern:"〜へと",example:"息(いき)づいた証(あかし)は 私(わたし)たちの oneness へと",meaning:"向著...而去（方向＋動態感）",level:"N3",learned:false},
-    {id:"g3",pattern:"〜合う",example:"惹(ひ)き合(あ)い 生(う)まれたキモチで",meaning:"互相...（雙方動作相互進行）",level:"N3",learned:false},
-    {id:"g4",pattern:"〜たなら",example:"言葉(ことば)を色濃(いろこ)く並(なら)べたなら 境界線(きょうかいせん)は解(と)けて",meaning:"若（已經）...的話（完了假定）",level:"N3",learned:false},
-    {id:"g5",pattern:"〜さえ〜ば",example:"信(しん)じ合(あ)えば",meaning:"只要...就...（最低條件）",level:"N3",learned:false}
+    {id:"g1",pattern:"〜のは",example:"孤独(こどく)を捨(す)てて掴(つか)むのは 出会(であ)う夢(ゆめ) 愛(あい)",exampleZh:"拋下孤獨後要緊握的，是相遇的夢，是愛",meaning:"...的（東西）是...（名詞化後接主題）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜へと",example:"息(いき)づいた証(あかし)は 私(わたし)たちの oneness へと",exampleZh:"那生命跳動的證明，流向我們的合一",meaning:"向著...而去（方向＋動態感）",level:"N3",learned:false},
+    {id:"g3",pattern:"〜合う",example:"惹(ひ)き合(あ)い 生(う)まれたキモチで",exampleZh:"彼此相吸引，以那油然而生的情感",meaning:"互相...（雙方動作相互進行）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜たなら",example:"言葉(ことば)を色濃(いろこ)く並(なら)べたなら 境界線(きょうかいせん)は解(と)けて",exampleZh:"若是濃重地排列起那些言語，界線便會消融",meaning:"若（已經）...的話（完了假定）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜さえ〜ば",example:"信(しん)じ合(あ)えば",exampleZh:"只要互相信任",meaning:"只要...就...（最低條件）",level:"N3",learned:false}
   ]},
   {id:7,title:"Determination Symphony",artist:"Roselia",group:"BanG Dream!",youtube:"9xThAJp0h58",note:"活動「秋時雨中撐起的一把傘」（紗夜對妹妹日菜的情結與決心）",level:"N3",distribution:{N5:23,N4:30,N3:30,N2:13,N1:4},grammar:[
-    {id:"g1",pattern:"〜でも",example:"今(いま)はまだ無理(むり)でも （向(む)き合(あ)う定(さだ)めよ）",meaning:"就算...也（讓步逆接）",level:"N4",learned:false},
-    {id:"g2",pattern:"〜に乗せて",example:"勇気(ゆうき)の祈(いの)りを音色(ねいろ)に乗(の)せて",meaning:"融入...之中、承載於...上",level:"N3",learned:false},
-    {id:"g3",pattern:"〜ずに",example:"捕(とら)われず Bring it on down",meaning:"不受...地（動作方式）",level:"N3",learned:false},
-    {id:"g4",pattern:"〜がちに",example:"伏(ふ)し目(め)がちになって",meaning:"容易...、動不動就...（傾向）",level:"N2",learned:false},
-    {id:"g5",pattern:"〜じゃない",example:"これで終(お)わりじゃない",meaning:"不是...（否定強調）",level:"N5",learned:false}
+    {id:"g1",pattern:"〜でも",example:"今(いま)はまだ無理(むり)でも （向(む)き合(あ)う定(さだ)めよ）",exampleZh:"就算現在還沒辦法（也是注定要面對的命運）",meaning:"就算...也（讓步逆接）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜に乗せて",example:"勇気(ゆうき)の祈(いの)りを音色(ねいろ)に乗(の)せて",exampleZh:"將勇氣的祈禱融入音色之中",meaning:"融入...之中、承載於...上",level:"N3",learned:false},
+    {id:"g3",pattern:"〜ずに",example:"捕(とら)われず Bring it on down",exampleZh:"不被束縛地",meaning:"不受...地（動作方式）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜がちに",example:"伏(ふ)し目(め)がちになって",exampleZh:"變得動不動就低著頭",meaning:"容易...、動不動就...（傾向）",level:"N2",learned:false},
+    {id:"g5",pattern:"〜じゃない",example:"これで終(お)わりじゃない",exampleZh:"這還不是結束",meaning:"不是...（否定強調）",level:"N5",learned:false}
   ]},
   {id:8,title:"Opera of the wasteland",artist:"Roselia",group:"BanG Dream!",youtube:"kzzXxwU3qo4",note:"劇情發展中，展現樂團如荒野歌劇般的宏大感",level:"N3",distribution:{N5:22,N4:30,N3:30,N2:13,N1:5},grammar:[
-    {id:"g1",pattern:"〜という〜は",example:"逃(に)げるという選択(せんたく)は 初(はじ)めから無(な)い",meaning:"所謂...的（引用或定義某概念）",level:"N3",learned:false},
-    {id:"g2",pattern:"〜たび（に）",example:"試練(しれん)の砦(とりで)を乗(の)り越(こ)える度(たび) 癒(い)す",meaning:"每當...時（重複動作觸發）",level:"N3",learned:false},
-    {id:"g3",pattern:"〜と共に",example:"仲間(なかま)と共(とも)に",meaning:"與...一起、伴隨著...",level:"N3",learned:false},
-    {id:"g4",pattern:"〜れる（受身）",example:"語(かた)り継(つ)がれる",meaning:"被...（被動形）",level:"N4",learned:false},
-    {id:"g5",pattern:"〜ずに〜ず",example:"倒(たお)れず挫(くじ)けず 歩(あゆ)んだ旅路(たびじ)が",meaning:"不...也不...（並列否定）",level:"N3",learned:false}
+    {id:"g1",pattern:"〜という〜は",example:"逃(に)げるという選択(せんたく)は 初(はじ)めから無(な)い",exampleZh:"所謂逃跑這個選項，從一開始就不存在",meaning:"所謂...的（引用或定義某概念）",level:"N3",learned:false},
+    {id:"g2",pattern:"〜たび（に）",example:"試練(しれん)の砦(とりで)を乗(の)り越(こ)える度(たび) 癒(い)す",exampleZh:"每當跨越考驗的堡壘，便療癒著",meaning:"每當...時（重複動作觸發）",level:"N3",learned:false},
+    {id:"g3",pattern:"〜と共に",example:"仲間(なかま)と共(とも)に",exampleZh:"與夥伴們一起",meaning:"與...一起、伴隨著...",level:"N3",learned:false},
+    {id:"g4",pattern:"〜れる（受身）",example:"語(かた)り継(つ)がれる",exampleZh:"被代代傳頌下去",meaning:"被...（被動形）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜ずに〜ず",example:"倒(たお)れず挫(くじ)けず 歩(あゆ)んだ旅路(たびじ)が",exampleZh:"不倒下也不屈服，那走過來的旅程",meaning:"不...也不...（並列否定）",level:"N3",learned:false}
   ]},
   {id:9,title:"－HEROIC ADVENT－",artist:"Roselia",group:"BanG Dream!",youtube:"HD--qY58fsM",note:"《卡片戰鬥!! 先導者》主題曲",level:"N4",distribution:{N5:30,N4:35,N3:25,N2:8,N1:2},grammar:[
-    {id:"g1",pattern:"〜てもいい",example:"涙(なみだ)流(なが)してもいいの",meaning:"...也可以、...也沒關係",level:"N5",learned:false},
-    {id:"g2",pattern:"〜こそ",example:"迷(まよ)う時(とき)こそ深呼吸(しんこきゅう)して Stand up!",meaning:"正是...才...（強調該時機）",level:"N3",learned:false},
-    {id:"g3",pattern:"〜なら",example:"恐(おそ)れが消(き)えるなら 傍(そば)にいる",meaning:"如果...的話（條件假定）",level:"N4",learned:false},
-    {id:"g4",pattern:"〜に乗せて",example:"渾身(こんしん)の一手(いって)を 今(いま) 夢(ゆめ)に乗(の)せて捧(ささ)ぐ",meaning:"承載於...之上（寄託）",level:"N3",learned:false},
-    {id:"g5",pattern:"〜ように",example:"手(て)を取(と)り合(あ)うように鳴(な)らす鼓動(こどう)",meaning:"像是...般（比喻動作方式）",level:"N3",learned:false}
+    {id:"g1",pattern:"〜てもいい",example:"涙(なみだ)流(なが)してもいいの",exampleZh:"哭出來也沒關係",meaning:"...也可以、...也沒關係",level:"N5",learned:false},
+    {id:"g2",pattern:"〜こそ",example:"迷(まよ)う時(とき)こそ深呼吸(しんこきゅう)して Stand up!",exampleZh:"正是迷惘的時候才要深呼吸、站起來！",meaning:"正是...才...（強調該時機）",level:"N3",learned:false},
+    {id:"g3",pattern:"〜なら",example:"恐(おそ)れが消(き)えるなら 傍(そば)にいる",exampleZh:"如果恐懼能消失的話，我就陪在你身邊",meaning:"如果...的話（條件假定）",level:"N4",learned:false},
+    {id:"g4",pattern:"〜に乗せて",example:"渾身(こんしん)の一手(いって)を 今(いま) 夢(ゆめ)に乗(の)せて捧(ささ)ぐ",exampleZh:"將全力以赴的一招，如今承載於夢想之上獻出",meaning:"承載於...之上（寄託）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜ように",example:"手(て)を取(と)り合(あ)うように鳴(な)らす鼓動(こどう)",exampleZh:"像是彼此牽著手般跳動的心跳",meaning:"像是...般（比喻動作方式）",level:"N3",learned:false}
   ]},
   {id:10,title:"軌跡",artist:"Roselia",group:"BanG Dream!",youtube:"WMuhZgcTeP4",note:"描繪成員間不變的感情（聲優更換紀念曲）",level:"N3",distribution:{N5:28,N4:32,N3:25,N2:11,N1:4},grammar:[
-    {id:"g1",pattern:"〜ように",example:"靴紐(くつひも)が解(ほど)ければ 結(むす)び直(なお)すように",meaning:"就像...那樣（比喻方式或目的）",level:"N3",learned:false},
-    {id:"g2",pattern:"〜ても〜ても",example:"別(わか)れても途切(とぎ)れても また繋(つな)がる為(ため)に",meaning:"就算...就算...也（多重讓步）",level:"N4",learned:false},
-    {id:"g3",pattern:"〜べく",example:"出逢(であ)うべく 人(ひと)は歩(あゆ)んでゆく",meaning:"為了...而（書面語，表目的）",level:"N2",learned:false},
-    {id:"g4",pattern:"〜そうならば",example:"哀(かな)しみで 胸(むね)の中(なか)溺(おぼ)れそうならば",meaning:"如果看起來快要...的話",level:"N4",learned:false},
-    {id:"g5",pattern:"〜てくれた",example:"大切(たいせつ)なものたちを残(のこ)してくれた",meaning:"為我...留下了...（別人施惠於說話者）",level:"N4",learned:false}
+    {id:"g1",pattern:"〜ように",example:"靴紐(くつひも)が解(ほど)ければ 結(むす)び直(なお)すように",exampleZh:"就像鞋帶鬆了就重新綁好那樣",meaning:"就像...那樣（比喻方式或目的）",level:"N3",learned:false},
+    {id:"g2",pattern:"〜ても〜ても",example:"別(わか)れても途切(とぎ)れても また繋(つな)がる為(ため)に",exampleZh:"就算分離就算斷裂，為了再次相連",meaning:"就算...就算...也（多重讓步）",level:"N4",learned:false},
+    {id:"g3",pattern:"〜べく",example:"出逢(であ)うべく 人(ひと)は歩(あゆ)んでゆく",exampleZh:"為了相遇，人們持續地走著",meaning:"為了...而（書面語，表目的）",level:"N2",learned:false},
+    {id:"g4",pattern:"〜そうならば",example:"哀(かな)しみで 胸(むね)の中(なか)溺(おぼ)れそうならば",exampleZh:"如果快要溺於滿胸的悲傷之中",meaning:"如果看起來快要...的話",level:"N4",learned:false},
+    {id:"g5",pattern:"〜てくれた",example:"大切(たいせつ)なものたちを残(のこ)してくれた",exampleZh:"為我們留下了那些珍貴的事物",meaning:"為我...留下了...（別人施惠於說話者）",level:"N4",learned:false}
   ]},
   {id:11,title:"感情グラス",artist:"河瀨茉希",group:"上伊那ぼたん、酔へる姿は百合の花",youtube:"QgqGBh3oclU",note:"ED 主題曲",level:"N4",distribution:{N5:35,N4:38,N3:20,N2:6,N1:1},grammar:[
-    {id:"g1",pattern:"〜たくて",example:"私(わたし)の心(こころ) 揺(ゆ)らいだの隠(かく)したくて",meaning:"想要...所以...（欲望＋原因連接）",level:"N4",learned:false},
-    {id:"g2",pattern:"〜やまない",example:"火照(ほて)りやまない",meaning:"止不住地...、不停地...（持續無法停止）",level:"N2",learned:false},
-    {id:"g3",pattern:"〜ように",example:"一口(ひとくち)味(あじ)わうように 名前(なまえ)を呼(よ)ぶ",meaning:"彷彿...般（比喻動作方式）",level:"N3",learned:false},
-    {id:"g4",pattern:"〜そうな",example:"こぼれそうな想(おも)いが胸(むね)を満(み)たす",meaning:"看起來快要...的（樣態修飾名詞）",level:"N4",learned:false},
-    {id:"g5",pattern:"〜なまま",example:"本音(ほんね)は曖昧(あいまい)なままでいい",meaning:"保持...的狀態（維持現狀）",level:"N3",learned:false}
+    {id:"g1",pattern:"〜たくて",example:"私(わたし)の心(こころ) 揺(ゆ)らいだの隠(かく)したくて",exampleZh:"因為想隱藏自己動搖的心",meaning:"想要...所以...（欲望＋原因連接）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜やまない",example:"火照(ほて)りやまない",exampleZh:"止不住地發燙",meaning:"止不住地...、不停地...（持續無法停止）",level:"N2",learned:false},
+    {id:"g3",pattern:"〜ように",example:"一口(ひとくち)味(あじ)わうように 名前(なまえ)を呼(よ)ぶ",exampleZh:"彷彿細細品嚐一口般，輕聲呼喚你的名字",meaning:"彷彿...般（比喻動作方式）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜そうな",example:"こぼれそうな想(おも)いが胸(むね)を満(み)たす",exampleZh:"滿溢而出的情感充滿胸口",meaning:"看起來快要...的（樣態修飾名詞）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜なまま",example:"本音(ほんね)は曖昧(あいまい)なままでいい",exampleZh:"真心話就這樣保持曖昧也沒關係",meaning:"保持...的狀態（維持現狀）",level:"N3",learned:false}
   ]},
   {id:12,title:"芽吹くとき",artist:"yonige",group:"上伊那ぼたん、酔へる姿は百合の花",youtube:"e3YbPn7E1ko",note:"OP 主題曲",level:"N4",distribution:{N5:38,N4:35,N3:20,N2:6,N1:1},grammar:[
-    {id:"g1",pattern:"〜てきた",example:"めいっぱい背伸(せの)びしてきたけど",meaning:"一直持續...到現在（動作的積累）",level:"N4",learned:false},
-    {id:"g2",pattern:"〜けれど／〜けど",example:"少(すこ)し違(ちが)うけれど 最後(さいご)はなにもいらない",meaning:"雖然...但是...（逆接）",level:"N4",learned:false},
-    {id:"g3",pattern:"〜なくちゃ",example:"伝(つた)えなくちゃ",meaning:"必須...（義務、口語形）",level:"N4",learned:false},
-    {id:"g4",pattern:"〜わけじゃない",example:"もう正解(せいかい)がほしいわけじゃないって",meaning:"並不是...（否定特定解釋）",level:"N2",learned:false},
-    {id:"g5",pattern:"〜んだね",example:"気(き)づいてないんだね",meaning:"原來是...啊（確認、輕微驚訝）",level:"N4",learned:false}
+    {id:"g1",pattern:"〜てきた",example:"めいっぱい背伸(せの)びしてきたけど",exampleZh:"雖然一直努力逞強、勉強讓自己成長",meaning:"一直持續...到現在（動作的積累）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜けれど／〜けど",example:"少(すこ)し違(ちが)うけれど 最後(さいご)はなにもいらない",exampleZh:"雖然有些不同，但最後我什麼都不要",meaning:"雖然...但是...（逆接）",level:"N4",learned:false},
+    {id:"g3",pattern:"〜なくちゃ",example:"伝(つた)えなくちゃ",exampleZh:"我必須把它傳達出去",meaning:"必須...（義務、口語形）",level:"N4",learned:false},
+    {id:"g4",pattern:"〜わけじゃない",example:"もう正解(せいかい)がほしいわけじゃないって",exampleZh:"已經不是想要得到什麼正確答案了",meaning:"並不是...（否定特定解釋）",level:"N2",learned:false},
+    {id:"g5",pattern:"〜んだね",example:"気(き)づいてないんだね",exampleZh:"你還沒有察覺呢",meaning:"原來是...啊（確認、輕微驚訝）",level:"N4",learned:false}
   ]},
   {id:13,title:"飛ぼうよ",artist:"yama",group:"黄泉のツガイ",youtube:"E0GTLXTcIYs",note:"ED 主題曲",level:"N3",distribution:{N5:30,N4:32,N3:28,N2:8,N1:2},grammar:[
-    {id:"g1",pattern:"〜ないように",example:"僕(ぼく)が離(はな)れないように 抱(だ)きしめて",meaning:"為了不...而...（否定目的）",level:"N3",learned:false},
-    {id:"g2",pattern:"〜まで",example:"糸(いと)が心臓(しんぞう)に届(とど)くまで",meaning:"直到...為止",level:"N4",learned:false},
-    {id:"g3",pattern:"〜ならば",example:"君(きみ)もまだ巣立(すだ)つ前(まえ)ならば",meaning:"如果...的話（書面語假定條件）",level:"N3",learned:false},
-    {id:"g4",pattern:"〜そうな",example:"飛(と)べそうな羽(はね)を見(み)つけたよ",meaning:"看起來能...的（樣態修飾名詞）",level:"N4",learned:false},
-    {id:"g5",pattern:"〜てきたから",example:"あなたならと思(おも)う日々(ひび)が増(ふ)えてきたから",meaning:"因為（某狀態）一直在增加...",level:"N4",learned:false}
+    {id:"g1",pattern:"〜ないように",example:"僕(ぼく)が離(はな)れないように 抱(だ)きしめて",exampleZh:"為了不讓我離開你，請抱緊我",meaning:"為了不...而...（否定目的）",level:"N3",learned:false},
+    {id:"g2",pattern:"〜まで",example:"糸(いと)が心臓(しんぞう)に届(とど)くまで",exampleZh:"直到那條絲線抵達心臟",meaning:"直到...為止",level:"N4",learned:false},
+    {id:"g3",pattern:"〜ならば",example:"君(きみ)もまだ巣立(すだ)つ前(まえ)ならば",exampleZh:"如果你也還未離巢啟程的話",meaning:"如果...的話（書面語假定條件）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜そうな",example:"飛(と)べそうな羽(はね)を見(み)つけたよ",exampleZh:"我找到了彷彿能再次飛翔的翅膀",meaning:"看起來能...的（樣態修飾名詞）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜てきたから",example:"あなたならと思(おも)う日々(ひび)が増(ふ)えてきたから",exampleZh:"因為覺得「如果是你就好了」的日子愈來愈多了",meaning:"因為（某狀態）一直在增加...",level:"N4",learned:false}
   ]}
 ];
 
 /* ── Furigana parser ── */
 function ruby(text) {
-  // 漢字(ふりがな) → <ruby>漢字<rt>ふりがな</rt></ruby>
   return text
-    .replace(/\\/g, '') // strip markdown escapes
+    .replace(/\\/g, '')
     .replace(/([^\s(（【〔「」『』()）\[\]]+)\(([^()（）]+)\)/g,
       (m, kanji, furi) => {
-        // Only if furi is hiragana/katakana (not Chinese or English)
         if (/^[぀-ヿㇰ-ㇿ･-ﾟ]+$/.test(furi)) {
           return `<ruby>${kanji}<rt>${furi}</rt></ruby>`;
         }
-        return m; // keep as-is (Chinese in parens, English notes, etc.)
+        return m;
       });
 }
 
@@ -1677,6 +1677,13 @@ function renderLyrics(s) {
 }
 
 /* ── Render grammar ── */
+function highlightPattern(pattern, exampleHtml) {
+  const core = pattern.replace(/^[〜～]+/, '').replace(/[（(].*$/, '').trim();
+  if (!core) return exampleHtml;
+  const esc = core.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return exampleHtml.replace(new RegExp(esc, 'g'), '<span class="gram-hi">$&</span>');
+}
+
 function renderGrammar(s) {
   const view = document.getElementById('grammar-view');
   view.innerHTML = '';
@@ -1684,12 +1691,16 @@ function renderGrammar(s) {
     const lnd = isL(s.id, g.id);
     const card = document.createElement('div');
     card.className = 'g-card'+(lnd?' learned':'');
+    const exHtml = highlightPattern(g.pattern, ruby(g.example));
+    const zhLine = g.exampleZh
+      ? `<div class="g-example-zh">▸ ${g.exampleZh}</div>` : '';
     card.innerHTML = `
       <div class="g-top">
         <div class="g-pattern">${g.pattern}</div>
         <span class="g-badge lv-${g.level}" style="background:${DC[g.level]};color:${TC[g.level]}">${g.level}</span>
       </div>
-      <div class="g-example">${ruby(g.example)}</div>
+      <div class="g-example">${exHtml}</div>
+      ${zhLine}
       <div class="g-meaning">${g.meaning}</div>
       <div class="g-check">
         <div class="g-chk-icon">${lnd?'✓':''}</div>
