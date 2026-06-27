@@ -140,11 +140,13 @@ rt{font-size:.62em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
   #mob-menu{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--sub);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
   #mob-title{font-size:13px;font-weight:600;color:var(--accent);flex:1}
   #mob-prog{font-size:11px;color:var(--sub)}
-  #m-head{padding:14px 16px 10px}
-  #head-top{flex-wrap:wrap;gap:10px}
-  #yt-wrap a{width:100%!important}
-  #yt-wrap img{width:100%!important}
-  #song-name{font-size:16px}
+  #m-head{padding:10px 14px 8px}
+  #head-top{flex-direction:column;gap:8px}
+  #song-name{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  #song-artist{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #yt-wrap{width:100%}
+  #yt-wrap a{width:100%!important;display:block}
+  #yt-wrap img{width:100%!important;height:auto!important}
   #tab-bar .tab{padding:10px 16px;font-size:13px}
   #lyrics-view{padding:16px}
   #grammar-view{padding:14px 12px;grid-template-columns:1fr}
