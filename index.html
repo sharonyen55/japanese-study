@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>歌詞で学ぶ 日本語</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f13;--surface:#1a1a22;--card:#22222e;--border:#2e2e3e;
+  --accent:#8b7cf8;--accent-soft:#2a2540;
+  --text:#e8e6f0;--sub:#9090a8;--muted:#5a5a72;
+  --n5:#4caf7d;--n4:#5b9bd5;--n3:#e6a817;--n2:#e07050;--n1:#cc4444;
+  --green:#3a4a3a;--green-b:#4caf7d;
+}
+body{font-family:'Segoe UI','Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
+
+/* ─ Sidebar ─ */
+#sidebar{width:260px;min-width:260px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .25s,min-width .25s}
+#sidebar.collapsed{width:40px;min-width:40px}
+#sidebar.collapsed #sb-content{display:none}
+#sidebar.collapsed #sb-toggle-icon{transform:rotate(180deg)}
+#sb-head{padding:12px 10px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;cursor:pointer}
+#sb-head-text{flex:1;min-width:0}
+#sb-toggle{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,color .15s}
+#sb-toggle:hover{background:var(--card);color:var(--text)}
+#sb-toggle-icon{font-size:10px;transition:transform .25s;display:inline-block}
+#sb-head h1{font-size:14px;font-weight:600;color:var(--accent);letter-spacing:.4px}
+#sb-head p{font-size:11px;color:var(--sub);margin-top:3px}
+#prog-wrap{margin-top:10px}
+#prog-label{font-size:11px;color:var(--sub);display:flex;justify-content:space-between;margin-bottom:4px}
+#prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+#prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s}
+#song-list{overflow-y:auto;flex:1;padding:6px 0}
+.s-item{padding:9px 14px;cursor:pointer;border-left:3px solid transparent;display:flex;align-items:center;gap:10px;transition:background .15s,border-color .15s}
+.s-item:hover{background:var(--card)}
+.s-item.active{background:var(--accent-soft);border-left-color:var(--accent)}
+.s-info{flex:1;min-width:0}
+.s-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-meta{font-size:11px;color:var(--sub);margin-top:2px;display:flex;gap:6px;align-items:center}
+.s-ring{width:28px;height:28px;flex-shrink:0}
+.lv-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.lv-N5{background:#1a3a2a;color:var(--n5)}.lv-N4{background:#1a2a3a;color:var(--n4)}
+.lv-N3{background:#3a2a10;color:var(--n3)}.lv-N2{background:#3a2010;color:var(--n2)}
+.lv-N1{background:#3a1010;color:var(--n1)}
+
+/* ─ Main ─ */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#m-head{padding:18px 26px 14px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+#head-top{display:flex;gap:18px;align-items:flex-start}
+#head-info{flex:1;min-width:0}
+#song-name{font-size:20px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#song-artist{font-size:13px;color:var(--sub);margin-top:5px}
+#dist-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;width:140px;gap:1px;margin-top:8px}
+#dist-bar span{height:100%}
+
+/* ─ Tabs ─ */
+#tab-bar{display:flex;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.tab{padding:10px 22px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--sub);transition:color .15s,border-color .15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ─ Lyrics ─ */
+#lyrics-view{flex:1;overflow-y:auto;padding:24px 28px;display:none}
+#lyrics-view.show{display:block}
+ruby{ruby-align:center}
+rt{font-size:.62em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
+.lyric-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.lyric-block:last-child{border-bottom:none}
+.lyric-ja{font-size:16px;line-height:2.2;font-family:'Noto Sans JP','Noto Sans TC',sans-serif;color:var(--text)}
+.lyric-zh{font-size:13px;color:var(--sub);margin-top:2px;line-height:1.6}
+.lyric-single{font-size:14px;color:var(--muted);font-style:italic;padding:6px 0}
+
+/* ─ Grammar ─ */
+#grammar-view{flex:1;overflow-y:auto;padding:22px 26px;display:none;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;align-content:start}
+#grammar-view.show{display:grid}
+.g-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
+.g-card:hover{border-color:var(--accent)}
+.g-card.learned{background:var(--green);border-color:var(--green-b)}
+.g-card.learned .g-pattern{color:#7dbf8a}
+.g-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.g-pattern{font-size:17px;font-weight:600;color:var(--accent);font-family:'Noto Sans JP',sans-serif;line-height:1.3}
+.g-badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;margin-left:8px;flex-shrink:0}
+.g-example{font-size:13px;line-height:1.7;background:rgba(255,255,255,.04);border-radius:5px;padding:7px 11px;margin-bottom:9px;border-left:3px solid var(--accent);font-family:'Noto Sans JP',sans-serif}
+.g-card.learned .g-example{border-left-color:var(--green-b)}
+.g-meaning{font-size:12px;color:var(--sub);line-height:1.6}
+.g-check{position:absolute;bottom:12px;right:14px;font-size:11px;color:var(--sub);display:flex;align-items:center;gap:3px;opacity:.55}
+.g-card.learned .g-check{color:var(--n5);opacity:1}
+.g-chk-icon{width:15px;height:15px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:8px}
+#empty{padding:60px 20px;text-align:center;color:var(--sub);font-size:14px;grid-column:1/-1}
+
+/* ─ Artist tree ─ */
+.artist-group{}
+.artist-hd{padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;user-select:none;transition:background .15s;border-bottom:1px solid var(--border)}
+.artist-hd:hover{background:var(--card);color:var(--text)}
+.artist-hd.open{color:var(--accent)}
+.artist-arrow{font-size:8px;transition:transform .2s;display:inline-block;flex-shrink:0}
+.artist-hd.open .artist-arrow{transform:rotate(90deg)}
+.artist-songs{overflow:hidden}
+.artist-songs.closed{display:none}
+.s-item{padding:7px 12px 7px 34px}
+
+/* ─ Home ─ */
+#home-view{flex:1;overflow-y:auto;padding:28px 32px;display:none}
+#home-view.show{display:block}
+.home-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px}
+.home-sub{font-size:13px;color:var(--sub);margin-bottom:22px}
+.home-total{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px}
+.home-nums{font-size:28px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.home-section{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin:22px 0 10px}
+.artist-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.ac{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;cursor:pointer;transition:border-color .2s}
+.ac:hover{border-color:var(--accent)}
+.ac-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px}
+.ac-meta{font-size:11px;color:var(--sub);margin-bottom:11px}
+.ac-pl{display:flex;justify-content:space-between;font-size:10px;color:var(--sub);margin-bottom:4px}
+.ac-pb{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.ac-pf{height:100%;background:var(--accent);border-radius:2px}
+.ac-dist{display:flex;height:4px;border-radius:2px;overflow:hidden;gap:1px}
+.ac-dist span{height:100%}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ─ Mobile ─ */
+#mob-bar{display:none}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99}
+@media(max-width:700px){
+  body{flex-direction:column}
+  #sidebar{position:fixed;top:0;left:-280px;width:280px;min-width:280px;height:100%;z-index:100;transition:left .25s,width .25s,min-width .25s;box-shadow:4px 0 24px rgba(0,0,0,.4)}
+  #sidebar.mobile-open{left:0}
+  #sidebar.collapsed{width:280px;min-width:280px}
+  #sidebar.collapsed #sb-content{display:flex;flex-direction:column;flex:1;overflow:hidden}
+  #sb-toggle{display:none}
+  #overlay{display:block}
+  #overlay.hidden{display:none}
+  #main{width:100%;height:100vh}
+  #mob-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+  #mob-menu{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--sub);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+  #mob-title{font-size:13px;font-weight:600;color:var(--accent);flex:1}
+  #mob-prog{font-size:11px;color:var(--sub)}
+  #m-head{padding:14px 16px 10px}
+  #head-top{flex-wrap:wrap;gap:10px}
+  #yt-wrap a{width:100%!important}
+  #yt-wrap img{width:100%!important}
+  #song-name{font-size:16px}
+  #tab-bar .tab{padding:10px 16px;font-size:13px}
+  #lyrics-view{padding:16px}
+  #grammar-view{padding:14px 12px;grid-template-columns:1fr}
+  #home-view{padding:16px}
+  .artist-cards{grid-template-columns:1fr}
+  .home-total{padding:14px 16px}
+}
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div id="sb-head" onclick="renderHome()" title="回首頁">
+    <div id="sb-head-text">
+      <h1>🎵 歌詞で学ぶ 日本語</h1>
+      <p>透過歌詞學習日文文法</p>
+    </div>
+    <button id="sb-toggle" onclick="event.stopPropagation();toggleSidebar()" title="收起側欄">
+      <span id="sb-toggle-icon">◀</span>
+    </button>
+  </div>
+  <div id="sb-content">
+    <div id="prog-wrap" style="padding:10px 16px 8px;border-bottom:1px solid var(--border)">
+      <div id="prog-label"><span>文法進度</span><span id="prog-txt">0 / 0</span></div>
+      <div id="prog-bar"><div id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div id="song-list"></div>
+  </div>
+</nav>
+
+<div id="overlay" class="hidden" onclick="closeMobileSidebar()"></div>
+
+<main id="main">
+  <div id="mob-bar">
+    <button id="mob-menu" onclick="openMobileSidebar()">☰</button>
+    <span id="mob-title">🎵 歌詞で学ぶ 日本語</span>
+    <span id="mob-prog"></span>
+  </div>
+  <div id="m-head">
+    <div id="head-top">
+      <div id="head-info">
+        <div id="song-name">← 請選擇一首歌</div>
+        <div id="song-artist"></div>
+        <div id="dist-bar"></div>
+      </div>
+      <div id="yt-wrap" style="display:none">
+        <a id="yt-link" href="#" target="_blank" rel="noopener" style="display:block;position:relative;width:220px;flex-shrink:0;border-radius:8px;overflow:hidden;text-decoration:none">
+          <img id="yt-thumb" src="" width="220" style="display:block;border-radius:8px">
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);gap:6px">
+            <div style="width:44px;height:44px;background:#ff0000;border-radius:50%;display:flex;align-items:center;justify-content:center">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><polygon points="9,7 19,12 9,17"/></svg>
+            </div>
+            <span style="color:#fff;font-size:11px;font-weight:500;letter-spacing:.3px">在 YouTube 觀看</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="tab-bar">
+    <div class="tab active" onclick="switchTab('lyrics')">歌詞</div>
+    <div class="tab" onclick="switchTab('grammar')">文法</div>
+  </div>
+  <div id="lyrics-view"><div style="padding:60px 20px;text-align:center;color:var(--sub)">從左側選擇歌曲</div></div>
+  <div id="grammar-view"><div id="empty">從左側選擇歌曲，開始學習文法句型</div></div>
+  <div id="home-view"></div>
+</main>
+
+<script>
+const LKEY = 'jplearn_v2';
+const DC = {N5:'#1a3a2a',N4:'#1a2a3a',N3:'#3a2a10',N2:'#3a2010',N1:'#3a1010'};
+const TC = {N5:'#4caf7d',N4:'#5b9bd5',N3:'#e6a817',N2:'#e07050',N1:'#cc4444'};
+const BC = {N5:'#4caf7d',N4:'#5b9bd5',N3:'#e6a817',N2:'#e07050',N1:'#cc4444'};
+
+/* ── Raw lyrics (format: JP line \n ZH line, blank line = verse break) ── */
+const LR = {};
+
+LR[1] = `暗(くら)い夜(よる)も (fighting)
+黑暗的夜晚也 (正在戰鬥)
+
+怯(おび)えずに今(いま) (smiling)
+現在毫不畏懼地 (微笑著)
+
+信(しん)じた道(みち) (running)
+在深信不疑的路上 (奔跑著)
+
+迷(まよ)わず進(すす)もう
+毫不猶豫地前行吧
+
+黒(くろ)でもいい (all right)
+就算是一片漆黑也無妨 (沒問題)
+
+白(しろ)じゃなくても (ok)
+就算並非純白也沒關係 (ok)
+
+不条理(ふじょうり)を壊(こわ)し
+打破這世間的不合理
+
+私(わたし)は此処(ここ)に今(いま) 生(い)きているから
+因為我現在就活在此處
+
+(SHOUT!) (吶喊吧！)
+
+不安(ふあん)に溢(あふ)れた
+充斥著不安的
+
+(SHOUT) 世(よ)の中(なか)のイロハ
+(吶喊) 這世界的生存準則
+
+(BLACK) 苛立(いらだ)ちと共(とも)に
+(漆黑) 伴隨著焦躁不安
+
+自由(じゆう)を奪(うば)ってく
+將自由奪走
+
+(BLACK) モノクロの雨(あめ)が
+(漆黑) 單色的雨水
+
+(SHOUT) 世界(せかい)を隠(かく)して
+(吶喊) 將世界遮蔽
+
+(BLACK) 空(そら)は嘲笑(あざわら)い沈(しず)んだ
+(漆黑) 天空嘲笑著沉入了黑暗
+
+邪魔(じゃま)するもの (嫉妬(しっと))
+阻礙我的事物 (嫉妒)
+
+振(ふ)り落(お)として (衝動(しょうどう))
+將其甩開 (衝動)
+
+私(わたし)の色(いろ) (本能(ほんのう))
+我原有的色彩 (本能)
+
+取(と)り戻(もど)したいから...！
+因為我想將其奪回...！
+
+例(たと)え明日(あした)が (missing)
+縱使明天 (迷失了方向)
+
+行(い)き止(ど)まりでも (going)
+哪怕已是窮途末路 (依然前行)
+
+自分(じぶん)の手(て)で (breaking)
+也要用自己的這雙手 (突破困境)
+
+切(き)り開(ひら)くんだ
+開拓出道路
+
+すくむ身体(からだ) (get up)
+蜷縮僵硬的身軀 (站起來吧)
+
+強(つよ)く抱(だ)いて (stacking)
+緊緊擁抱著 (堆疊信念)
+
+覚悟(かくご)で踏(ふ)み出(だ)し
+帶著覺悟踏出腳步
+
+叶(かな)えたい夢(ゆめ) 勝ち取(かちと)れ今(いま)すぐに！
+想要實現的夢想 現在立刻去贏取它吧！
+
+ありきたりなんて
+那種平凡庸俗的事情
+
+(SHOUT) 嫌(いや)なの全(すべ)てが
+(吶喊) 我全部都討厭
+
+(BLACK) いつもと同(おな)じに？
+(漆黑) 想要一如往常？
+
+そんなのありえない
+那種事絕不可能
+
+(BLACK) 声(こえ)を高(たか)らかに
+(漆黑) 高聲歌唱吧
+
+(SHOUT) 本音(ほんね)に答(こた)える
+(吶喊) 回應內心真實的想法
+
+(BLACK) 嘆(なげ)くよりずっと大事(だいじ)で
+(漆黑) 這比嘆氣要來得重要得多
+
+誘惑(ゆうわく)には (何度(なんど))
+面對誘惑 (無論幾次)
+
+惑(まど)わされず (幻想(げんそう))
+都不會被迷惑 (幻象)
+
+震(ふる)えた胸(むね) (凛(りん)と)
+顫抖的胸腔 (威風凜凜地)
+
+熱(あつ)く鳴(な)らしたんだ
+炙熱地鳴響著
+
+しがらみから (hinder)
+從層層束縛中 (阻礙)
+
+解(と)き放(はな)つ今(いま) (relight)
+現在獲得解放 (重燃火光)
+
+ニセモノには (don't go)
+我才不想變成 (別去那裡)
+
+なりたくないの
+那些虛假之物
+
+甘(あま)え捨(す)てて (begin)
+捨棄依賴 (開始吧)
+
+強(つよ)さに変(か)える (wake up)
+將其轉化為強大 (覺醒吧)
+
+輝(かがや)いて姿(すがた)
+綻放光芒的身影
+
+掴(つか)め未来(みらい)を 決意(けつい)の手(て)のひらで
+用充滿決意的掌心 抓住未來吧
+
+揺(ゆ)らぐ視線(しせん) (残像(ざんぞう))
+搖擺不定的視線 (殘影)
+
+守(まも)るように (一層(いっそう))
+像是守護著一般 (更加地)
+
+固(かた)く結(むす)び (ギュッと)
+牢牢地結合 (緊緊地)
+
+勇気(ゆうき)で繋(つな)ぐから
+用勇氣將其維繫`;
+
+LR[2] = `裏切(うらぎ)りは暗(くら)いまま fall down
+背叛依然籠罩在黑暗中墮落
+
+崩(くず)れゆく世界(せかい)は
+崩壞中的世界
+
+心引(こころひ)き剥(は)がして熱(ねつ)を失(うしな)った
+將心生生剝離，失去了溫度
+
+未(いま)だに弱(よわ)さ滲(にじ)む on mind
+內心依然滲透著軟弱 on mind
+
+未熟(みじゅく)さを抱(かか)えて
+懷抱著這份不成熟
+
+歌(うた)う資格(しかく)なんてないと背(せ)を向(む)けて
+認為自己沒有歌唱的資格而轉身逃避
+
+色褪(いろあ)せた瞳(ひとみ) 火(ひ)をつけた
+讓你那褪色的雙瞳 燃起火焰的
+
+あなたの言葉(ことば)
+是你的那句話
+
+Louder...!
+更大聲地...!
+
+You're my everything (You're my everything)
+你是我的一切 (你是我的一切)
+
+輝(かがや)き溢(あふ)れゆくあなたの音(おと)は
+你那滿溢著光輝的聲音
+
+私(わたし)の音(おと)で try to... 伝(つた)えたいの
+我想用我的聲音 嘗試去... 傳達出去
+
+I'm movin' on with you (movin' on with you)
+我與你一同前行 (與你一同前行)
+
+届(とど)けたいよ全(すべ)て
+想要傳達這一切
+
+あなたがいたから私(わたし)がいたんだよ
+正因為有你，才有了現在的我
+
+No more need to cry きっと
+一定 不需要再哭泣了
+
+脆(もろ)さは砕(くだ)けばいい so long
+脆弱的部分只要將其粉碎就好 再見了
+
+刹那(せつな)に幼(おさな)さを連(つ)れて
+在剎那間帶著那份稚嫩
+
+叶(かな)えてみせるから
+我一定會實現給你看
+
+I don't look back
+我絕不回頭
+
+選(えら)ぶのは必然(ひつぜん)で all time
+這份選擇始終是種必然
+
+ひりついた素肌(すはだ)も見(み)せて？
+連刺痛的肌膚也展露出來嗎？
+
+恥(は)じる事(こと)はないの
+沒什麼好羞恥的
+
+いつまでも
+無論到何時
+
+あぁ... 迷(まよ)いなんてないわ
+啊... 已經沒有任何迷惘了
+
+臆(おく)さないよ
+我不會膽怯的
+
+言葉(ことば)の一つも
+連一個字也不會
+
+To listen...
+傾聽吧...
+
+I will never die (I will never die)
+我永不熄滅 (我永不熄滅)
+
+生(う)まれ落(お)ちた場所(ばしょ)で運命(うんめい)を遂(と)げるまで
+在誕生之處直到完成使命為止
+
+このままずっと keep on running
+就這樣一直 持續奔跑
+
+Nothing's gonna change my world (gonna change my world)
+沒有什麼能改變我的世界 (改變我的世界)
+
+静寂(せいじゃく)には so good-bye
+向靜寂 告別吧
+
+もっと激(はげ)しく揺(ゆ)らせ 起(お)こせ波風(なみかぜ)
+更激烈地搖動吧 掀起風浪
+
+初(はじ)めての声(こえ)で
+用這最初的聲音
+
+Only one... 歌(うた)をほどけば
+唯一的一首... 若解開這首歌
+
+あの頃(ころ)の私(わたし)がいて
+便會有那時的我
+
+あの頃(ころ)のあなたが笑(わら)うよ
+而那時的你正微笑著
+
+I renew one's hopes ただ
+我僅僅是 重新燃起希望
+
+強(つよ)く （強(つよ)く）
+強韌地 （強韌地）
+
+熱(あつ)く （熱(あつ)く）
+熾熱地 （熾熱地）
+
+届(とど)け （届(とど)け）
+傳達吧 （傳達吧）
+
+Sing for...
+為此而唱...
+
+Feel alive...
+感覺自己正活著...`;
+
+LR[3] = `虚勢(きょせい)を張(は)り続(つづ)けてる無意識(むいしき)の痛(いた)みに
+持續逞強著，在那無意識的痛楚之中
+
+掻(か)きむしる胸(むね) ずっと苦(くる)しくて
+心如刀割，一直以來都如此痛苦
+
+傷口(きずぐち)を隠(かく)す指(ゆび)を優(やさ)しくほどく眼差(まなざ)しは
+溫柔地撥開那遮掩傷口的手指，那道眼神
+
+崩(くず)れそうな身体(からだ)を包(つつ)んで 癒(い)した
+包容並療癒了，我那幾近崩潰的身軀
+
+孤独(こどく)の傍(そば)へ寄(よ)りそう命(いのち)の声(こえ)は
+依偎在孤獨身旁的生命之聲
+
+光(ひかり)を生(う)み出(だ)し照(て)らすよ
+正孕育著光芒，將前方照亮
+
+幾度(いくど)
+無論幾次
+
+Ever, ever, ever, ever 苦(くる)しくても
+Ever, ever, ever, ever 就算再怎麼痛苦
+
+Ever, ever, ever, ever 信(しん)じてるわ
+Ever, ever, ever, ever 我依然深信著
+
+強(つよ)く(強(つよ)く) 繋(つな)ぐ(繋(つな)ぐ)
+強韌地 (強韌地) 繫起 (繫起)
+
+たおやかな絆(きずな)は そう
+那優雅而韌性的牽絆 是的
+
+Be light, be light, be light, be light 柔(やわ)らかくて
+Be light, be light, be light, be light 如此輕柔
+
+Be light, be light, be light, be light 暖(あたた)かいの
+Be light, be light, be light, be light 如此溫暖
+
+進(すす)み(進(すす)み) 此処(ここ)で成(な)し遂(と)げてゆく 未来(みらい)
+向前邁進 (向前邁進) 在此處徹底實現的 未來
+
+隔(へだ)てなく与(あた)えられた優(やさ)しさが辛(つら)いよ
+那份毫無隔閡被賦予的溫柔，反而令我難受
+
+勝手(かって)な私(わたし) もっと思(おも)い知(し)る
+讓任性的我，更加深切地體會到了
+
+気持(きも)ちには向(む)き合(あ)わずに 弱(よわ)さを選(えら)び 目(め)を閉(と)じる
+不願正視內心，選擇軟弱地閉上雙眼
+
+気付(きづ)くのが遅(おそ)すぎた事(こと)を (悔(く)やんで)
+為了察覺時已為時已晚一事 (懊悔著)
+
+淀(よど)みなく澄(す)んだ言葉(ことば)を伝(つた)えればもう
+若能傳達出毫無迷惘、清澈透明的話語
+
+しかるべき奇跡(きせき)起(お)きるわ
+應當發生的奇蹟便會降臨
+
+怯(おび)えないで
+不要恐懼
+
+あの日(ひ) I know, I know, I know, I know 抱(かか)えたもの
+那一天 I know, I know, I know, I know 所懷抱的事物
+
+I know, I know, I know, I know 手放(てばな)せない
+I know, I know, I know, I know 絕對無法放手
+
+愛(いと)し(愛(いと)し) 決(き)めた(決(き)めた) 突き進(つきすす)んでゆくと
+如此憐惜 下定決心 要勇往直前地走下去
+
+だから
+所以說
+
+Ride on, ride on, ride on, ride on 赤裸々(せきらら)でも
+Ride on, ride on, ride on, ride on 縱使赤裸無飾
+
+Ride on, ride on, ride on, ride on 積(つ)み重(かさ)ねる
+Ride on, ride on, ride on, ride on 也要不斷累積
+
+此処(ここ)で成(な)し遂(と)げてゆく 未来(みらい)
+在此處徹底實現的 未來`;
+
+LR[4] = `運命(うんめい)を繋(つな)ぐ 赤(あか)き道(みち)しるべ
+聯繫著命運，那赤紅的指路標
+
+唯々前(ただただまえ)を見(み)つめて 目指(めざ)すわ
+僅僅注視著前方，向著目標邁進
+
+声(こえ)となって 表情(ひょうじょう)となって 導(みちび)いてく
+化作聲音，化作表情，引導著我前行
+
+やさしい人(ひと)よ 陽(ひ)だまりロードナイト
+溫柔的人啊，陽光普照的薔薇輝石
+
+心(こころ)が悴(かじか)んでも 「大丈夫(だいじょうぶ)」と
+縱使心靈凍結僵硬，你仍說著「沒關係的」
+
+言葉(ことば)で いつも抱(だ)きしめた
+用話語，總是緊緊地擁抱著我
+
+笑顔(えがお)ひとしずく
+那一滴笑容
+
+幸(しあわ)せが沁(し)みわたって
+幸福感沁入心扉
+
+頬濡(ほおぬ)らした夜(よる)も
+即使是淚濕雙頰的夜晚
+
+すべて受(う)け止(と)め 信(しん)じ
+也全盤接收，深信不疑
+
+変(か)わるよ 世界(せかい)が
+世界將會改變
+
+こんなにも愛(いと)しさで満(み)ちてる
+胸中充溢著如此深切的愛意
+
+明日(あした)も まぶしいくらいに
+明天也同樣，燦爛得令人眩目
+
+離(はな)れていても 帰(かえ)る場所(ばしょ)がある
+即使相隔遙遠，也有個可以回去的地方
+
+どんな時(とき)でも 傍(そば)にいてくれた
+無論何時，你都陪伴在我的身旁
+
+太陽(たいよう)となって 月(つき)となって 照(て)らしてく
+化作太陽，化作月亮，照耀著我
+
+つよい人(ひと)よ 陽(ひ)だまりロードナイト
+堅強的人啊，陽光普照的薔薇輝石
+
+励(はげ)ます魔法(まほう)のように 囁(ささや)いたの
+如同鼓勵的魔法一般，輕聲呢喃著
+
+「あなたがいれば、怖(こわ)くないよ」
+「只要有你在，我就不再恐懼」
+
+日々(ひび)は
+每一天
+
+色(いろ)づき煌(きら)めく
+都染上色彩閃耀著
+
+初(はじ)めての気持(きも)ちを
+這份初次體會到的情感
+
+教(おし)えてくれた もっと
+你教導了我更多更多
+
+名前(なまえ)を呼(よ)ぶ声(こえ)
+呼喚著名字的聲音
+
+こんなにも特別(とくべつ)な事(こと)だと
+竟是如此特別的一件事
+
+想(おも)い あふれてゆく
+思緒 滿溢而出`;
+
+LR[5] = `波音(なみおと)は陰(かげ)を流(なが)して
+海浪聲沖刷掉了陰影
+
+暖(あたた)かな両手(りょうて)を握(にぎ)るよ
+緊握住那溫暖的雙手
+
+陽炎(かげろう)に映(うつ)した 曇(くも)りなき希望(きぼう)は
+映照在蜃景之中，那毫無陰霾的希望
+
+無限(むげん)に華咲(はなさ)く
+將無限地如花綻放
+
+蒼色(あおいろ)描(えが)く (fly high!)
+描繪出蒼藍之色 (飛向高處吧！)
+
+コントレイルを (fly high!)
+在那飛機雲上 (飛向高處吧！)
+
+優(やさ)しさでなぞれば生(う)まれた
+若用溫柔去描摹，便會誕生
+
+思(おも)い出(で)すべて (fly high!)
+所有的回憶 (飛向高處吧！)
+
+私(わたし)たち またひとつ繋(つな)がる
+我們 再次合而為一
+
+目(め)が眩(くら)むほどに強(つよ)く
+強烈得令人目眩神迷
+
+灼熱(しゃくねつ)に期待(きたい)がふるえ
+在灼熱之中，期待正顫抖著
+
+至極(しごく)美(うつく)しく鳴(な)る音色(ねいろ)
+那是極其優美響起的音色
+
+独(ひと)りでは知(し)らない 旋律(せんりつ)を与(あた)え
+賦予了我，獨自一人無法知曉的旋律
+
+心(こころ)にヒカリが
+心靈湧現了光芒
+
+つぶやく声(こえ)は (do it!)
+呢喃的聲音 (放手做吧！)
+
+潮風(しおかぜ)に乗(の)り (do it!)
+乘著海風 (放手做吧！)
+
+言霊(ことだま)はやがて嵐(あらし)へと
+言語的靈魂終將化作風暴
+
+この先(さき)の永遠(えいえん)を許(ゆる)した
+允諾了這之後的永遠
+
+何度(なんど)も産声(うぶごえ)を上(あ)げて
+無數次地發出初生的啼哭
+
+熱帯夜(ねったいや) 泳(およ)ぐよう瞬(まばた)く
+在熱帶夜裡，如游動般閃爍著
+
+鮮(あざ)やかな星々(ほしぼし)のように
+如同那鮮豔奪目的群星
+
+結(むす)んで握(にぎ)れば 私(わたし)たちだけの
+若能將手緊緊相繫，屬於我們的
+
+星座(せいざ)がページを綴(つづ)り出すの
+星座便會將每一頁開始編織成冊
+
+見上(みあ)げれば空(そら)は どこまでも青(あお)く
+昂首仰望，天空無論到哪都如此湛藍
+
+不可能(ふかのう)なんてないわ
+這世上沒有所謂的不可能
+
+頂点(ちょうてん)へ 狂(くる)い咲(ざ)け
+向著頂點，瘋狂地綻放吧`;
+
+LR[6] = `心(こころ)が呼(よ)ぶ方(ほう)へ 翔(か)けるパルス
+心靈呼喚的方向，奔騰的脈動
+
+此処(ここ)に集(あつ)まるは we are
+在此聚集的人們 we are
+
+揺(ゆ)るがない信念(しんねん)だけ
+唯有那不可動搖的信念
+
+共(とも)に往(ゆ)こう 果(は)てに
+攜手同行吧，朝向盡頭
+
+全(すべ)て賭(か)けた 覚悟(かくご)抱(だ)いて
+懷抱著賭上一切的覺悟
+
+孤独(こどく)を捨(す)てて掴(つか)むのは
+捨棄孤獨後所抓住的
+
+出会(であ)う夢(ゆめ) 愛(あい)
+交會的夢想 愛
+
+無(な)くてはならないモノ
+絕不能缺失的事物
+
+重(かさ)なる胸(むね)ふるわせ
+重疊的波動，令胸中悸動不已
+
+ひとつになり瞬(まばた)いた 光(ひかり)のメロディアス
+合而為一閃耀著，那光芒般的旋律
+
+湛(たた)えた熱情(ねつじょう)は キズナ越(こ)えて
+盈滿的熱情，超越了羈絆
+
+息(いき)づいた証(あかし)は 私(わたし)たちの oneness へと
+生生不息的證明，將引導向我們的 oneness
+
+惹(ひ)き合(あ)い 生(う)まれたキモチで
+用那相互吸引而生的心情
+
+芽吹(めぶ)いて 最上(さいじょう)へと
+開芽茁壯，朝向巔峰
+
+華(はな)やぎだす声色(こわいろ)が 奇蹟(きせき)をそそいだ
+變得絢麗的音色，便注入了奇蹟
+
+言葉(ことば)を色濃(いろこ)く並(なら)べたなら
+若將話語鮮明地排練開來
+
+境界線(きょうかいせん)は解(と)けて 私(わたし)たちの oneness へと
+境界線便會融化，引導向我們的 oneness
+
+舞(ま)い降(お)りた微笑(ほほえ)み 何度(なんど)も触(ふ)れさせて
+降臨的微笑，請讓我無數次地觸碰`;
+
+LR[7] = `潤(うる)んだ予感(よかん)は Bye now
+濕潤的預感 Bye now
+
+滴(したた)る痛(いた)みの中(なか) 雨色(あめいろ)に染(そ)まって
+在滴落的痛楚之中 染上了雨的色彩
+
+大(おお)きく開(ひら)いた Distance
+逐漸擴大的距離
+
+いつの間(ま)にか落(お)ちてゆくわ... 冷(つめ)たさに
+不知不覺間墜落了... 墜入冰冷之中
+
+降(ふ)り止(や)まない苦(くる)しみに差(さ)し出(だ)された
+在那落個不停的苦難之中 遞到我面前的是
+
+微笑(ほほえ)みの Umbrella
+微笑的雨傘
+
+思(おも)うまま Bring it on down
+隨心所欲地 奮力出擊
+
+決意(けつい)の調(しら)べ (Hang in there)
+決意的旋律 (堅持下去)
+
+勇気(ゆうき)の祈(いの)りを音色(ねいろ)に乗(の)せて (Get over)
+將勇氣的祈禱融入音色中 (跨越困難)
+
+約束(やくそく)繋(つな)ぐ指先(ゆびさき)で弾(ひ)くの
+用連繫著約定的指尖 彈奏而出
+
+いつしか貴方(あなた)の横(よこ)で
+總有一天要在你身旁
+
+今(いま)はまだ無理(むり)でも （向(む)き合(あ)う定(さだ)めよ）
+即便現在還無法做到 (這是必須面對的命運)
+
+ワタシハ ヤメナイ
+我 不會停止
+
+蜃気楼(しんきろう)のようで Fleeting
+宛如海市蜃樓般 稍縱即逝
+
+淀(よど)んだ景色(けしき)が行(ゆ)く 伏(ふ)し目(め)がちになって
+渾濁的景色流逝 眼神不禁變得低垂
+
+声(こえ)も届(とど)かずに散(ち)りだす はらはらと
+連聲音都傳達不到便紛紛凋落 飄零零地
+
+誇(ほこ)りを 今(いま)に取(と)り戻(もど)すわ
+現在就要 將這份自豪奪回
+
+セカイデ ヒトツノ タイセツナヒト
+世界上 唯一的 最重要的人
+
+ツナゲ ココロ フカク
+連結吧 心靈 深處地
+
+ツナゲ ユメヲ シナヤカニ
+連結吧 夢想 韌性地
+
+ワタシヨ ツキススメ！
+我啊 勇往直前吧！`;
+
+LR[8] = `Far away 胸(むね)に高鳴(たかな)りを吸(す)い込(こ)んで Far away
+將胸中的悸動深深吸入
+
+天(てん)を仰(あお)ぎ 始(はじ)まりを始(はじ)めよう
+仰望蒼天 讓開始正式啟程吧
+
+牙(きば)を剥(む)く者(もの)が 待(ま)ち構(かま)える迷宮(めいきゅう)へ
+向著那獠牙畢露之徒 伺機而動的迷宮前行
+
+貴方(あなた)の眼(め) 恐(おそ)れを消(け)し去(さ)るわ
+你的雙眼 將恐懼消抹殆盡
+
+逃(に)げるという選択(せんたく)は 初(はじ)めから無(な)い
+所謂逃跑的選項 從一開始就不存在
+
+幾億幾千(いくおくいくせん) 紡(つむ)いだ軌跡(きせき)に (step by step)
+在幾億幾千次 編織而成的軌跡中 (步步前行)
+
+伝説(でんせつ)は此処(ここ)からうまれた
+傳說便由這方土地誕生
+
+荒野(こうや)を駆(か)けゆく光(ひかり)となる時(とき)
+當化作在荒野中馳騁的光芒之時
+
+私(わたし)たちが創(つく)る 真実(しんじつ)
+由我們 創造 真相
+
+語(かた)り継(つ)がれる
+將會世世代代傳承下去
+
+枯(か)れた海(うみ)の底(そこ) 眠(ねむ)る声(こえ)
+沉眠在乾涸海底的聲音
+
+瞳(ひとみ)の奥(おく) 共鳴(きょうめい)する意識(いしき)
+在瞳孔深處 產生共鳴的意識
+
+試練(しれん)の砦(とりで)を乗(の)り越(こ)える度(たび) 癒(い)す
+每當跨越那試練的堡壘 療癒著一切
+
+貴方(あなた)の手(て) 優(やさ)しさ溢(あふ)れてる
+你的雙手 正洋溢著溫柔
+
+予定調和(よていちょうわ)なぎ倒(たお)し 掲(かか)げた誓(ちか)い
+將墨守成規橫掃擊潰 揭開高舉的誓言
+
+倒(たお)れず挫(くじ)けず 歩(あゆ)んだ旅路(たびじ)が (day by day)
+不曾倒下不曾氣餒 踏過來的旅程 (日復一日)
+
+新世界(しんせかい) 呼(よ)び寄(よ)せたんだわ
+成功喚來了全新的世界
+
+迎(むか)えた景色(けしき)は一際(ひときわ)まぶしく
+迎來的景色顯得格外耀眼
+
+結末(けつまつ)に優(やさ)しく微笑(ほほえ)む
+向著結局露出了溫柔的微笑
+
+愛(あい)は 滅(ほろ)びはしない
+愛 絕不會破滅`;
+
+LR[9] = `未知(みち)なる暗闇(くらやみ) 立(た)ちはだかれば
+當未知的黑暗 擋在前方之時
+
+生(う)まれた震(ふる)えの行(ゆ)き先(さき)
+將那產生的顫抖之歸宿
+
+勇気(ゆうき)で抱(だ)きしめた
+用勇氣緊緊擁抱
+
+涙流(なみだなが)してもいいの
+流下淚水也無妨喔
+
+恐(おそ)れが消(き)えるなら
+只要恐懼能就此消散
+
+傍(そば)にいる この絆(きずな)が支(ささ)えるわ
+就在身旁的這份羈絆 會支撐著你
+
+迷(まよ)う時(とき)こそ深呼吸(しんこきゅう)して Stand up!
+正因迷惘才更要深呼吸 站起來吧！
+
+五感(ごかん)を研(と)ぎ澄(す)ませて
+研磨並銳化你的五感
+
+立(た)ち向(む)かえ 命(いのち)を気高(けだか)く咲(さ)かせ
+挺身對抗 讓生命孤高地綻放
+
+渾身(こんしん)の一手(いって)を 今(いま) 夢(ゆめ)に乗(の)せて捧(ささ)ぐ
+將全身全靈的一手 如今 承載於夢想之上獻出
+
+仲間(なかま)と共(とも)に
+與夥伴們一同
+
+想像(そうぞう)が 勝利(しょうり)を連(つ)れてくる
+想像力 將會帶來勝利
+
+木霊(こだま)した想(おも)い 胸(むね)に刻(きざ)んで
+將迴盪的思念 銘刻在心中
+
+紡(つむ)いだ希望(きぼう)を纏(まと)えば
+若披上那編織而成的希望
+
+何(なに)よりも強(つよ)くて
+便會比任何事物都強大
+
+どんな絶望的(ぜつぼうてき)でも
+無論陷入怎樣的絕望
+
+正(ただ)しく渡(わた)ってゆく
+都能正確地橫渡而去
+
+傍(そば)にいる この絆(きずな)が導(みちび)くわ
+就在身旁的這份羈絆 會引領著你
+
+手(て)を取(と)り合(あ)うように鳴(な)らす鼓動(こどう)
+如同牽起彼此雙手般 鳴響的搏動
+
+心(こころ)のまま 選(えら)べばいい
+順從你的心 做出選擇就好
+
+決(けっ)して 負(ま)けないわ
+絕對 不會認輸的`;
+
+LR[10] = `靴紐(くつひも)が解(ほど)ければ 結(むす)び直(なお)すように
+若鞋帶鬆脫了 就像那重新繫好般
+
+別(わか)れても途切(とぎ)れても また繋(つな)がる為(ため)に
+即使離別即使斷絕 也是為了再次相連
+
+出逢(であ)うべく 人(ひと)は歩(あゆ)んでゆく
+為了那注定的邂逅 人們持續邁步前行
+
+哀(かな)しみで 胸(むね)の中(なか)溺(おぼ)れそうならば
+若因哀傷 讓心中幾近溺斃的話
+
+笑(わら)う貴方(あなた)の瞳(ひとみ)が ほらね ただ綺麗(きれい)で
+微笑著的你的雙眸 瞧啊 是如此美麗
+
+巡(めぐ)り逢(あ)うよう 命(いのち)は繰(く)り返(かえ)してく
+像是為了重逢 命運不斷輪迴前行
+
+始(はじ)まりという名(な)の道(みち)
+在那名為「開始」的道路上
+
+振(ふ)り向(む)かず前(まえ)を見(み)つめ
+不再回頭 凝視前方
+
+廻(まわ)る地球(ちきゅう) 貴方(あなた)と私(わたし)は進(すす)む
+旋轉的地球上 你與我一同前進
+
+握(にぎ)る手離(てはな)れても
+即便緊握的手鬆開了
+
+終(お)わらない絆(きずな)がある
+依然有著永不終結的牽絆
+
+明日(あした)もまた来(く)ることが 当(あ)たり前(まえ)のように
+將明日的再度降臨 視為理所當然般
+
+保証(ほしょう)もない日々(ひび)の儚(はかな)さ
+那毫無保證的日常中的虛幻
+
+振(ふ)り返(かえ)る 優(やさ)しさに満(み)ちた毎日(まいにち)は
+回首過往 那些充滿溫柔的每一天
+
+大切(たいせつ)なものたちを残(のこ)してくれた
+為我留下了許多珍貴的事物
+
+歌(うた)をうたい ひたすら愛(いと)しさを告(つ)げ
+放聲歌唱 一心一意地傳達這份愛憐
+
+溢(あふ)れ出(だ)す想(おも)いはずっと
+滿溢而出的思緒將會永遠
+
+星(ほし)のように瞬(まばた)くから
+如繁星般閃爍不停
+
+此処(ここ)で逢(あ)えた 貴方(あなた)と私(わたし)の軌跡(きせき)
+在此處相遇的 你與我的軌跡
+
+一(ひと)つだって忘(わす)れないわ いつまでも熱(あつ)いままで
+任何一個我都不會忘記 永遠保持著那份灼熱`;
+
+LR[11] = `水面(みなも)の波紋(はもん)から 顔(かお)逸(そ)らしたのは
+從水面的漣漪移開視線，
+
+私(わたし)の心(こころ) 揺(ゆ)らいだの隠(かく)したくて
+是因為想隱藏自己動搖的心。
+
+あなたと並(なら)んでるだけの心臓(しんぞう)が
+只是與你並肩站著，
+
+火照(ほて)りやまない
+心臟便止不住地發燙。
+
+酔(よ)い 吐息(といき) はにかんで
+微醺著，羞澀地吐出氣息，
+
+柔(やわ)い夢(ゆめ)を見(み)て
+做著溫柔的夢，
+
+袖(そで)触(ふ)れて 満(み)ち引(ひ)いて
+衣袖輕觸，心情起伏，
+
+目(め)が合(あ)った
+四目相對。
+
+奥底(おくそこ)のまぶしさを
+將內心深處的耀眼光芒，
+
+一口(ひとくち)味(あじ)わうように
+彷彿細細品嚐一口般，
+
+名前(なまえ)を呼(よ)ぶ
+輕聲呼喚你的名字。
+
+喉(のど)通(とお)ったフレイバーには
+那滑過喉間的滋味裡，
+
+初(はじ)めて知(し)る感情(かんじょう)あふれ
+滿溢著初次知曉的感情，
+
+あこがれも傷(きず)も全(すべ)て 今(いま)
+無論憧憬還是傷痛，此刻全都
+
+溶(と)け込(こ)んで 光(ひか)る
+交融其中，閃耀著光芒。
+
+グラスを透(す)かしては 向(む)こう側(がわ)覗(のぞ)いた
+透過玻璃杯，望向另一側，
+
+流(なが)る雲(くも)を 目線(めせん)でなぞるあなた
+你的視線追逐著流動的雲朵。
+
+世界(せかい)が変(か)わるほど綺麗(きれい)だと思(おも)った
+我覺得那美麗得彷彿能改變整個世界，
+
+風吹(かぜふ)く午後(ごご)
+在微風吹拂的午後。
+
+隣(とな)り合(あ)う 影(かげ)と影(かげ)
+彼此相依的兩道身影，
+
+そっと期待(きたい)をして
+悄悄地懷抱期待，
+
+打(う)ち消(け)して 待(ま)ちあぐね 手(て)を取(と)った
+卻又否定它，在等待與猶豫之中牽起了手。
+
+ほろ苦(にが)い ほの甘(あま)い
+微苦又帶著淡淡甘甜，
+
+こぼれそうな想(おも)いが胸(むね)を満(み)たす
+滿溢而出的情感充滿胸口。
+
+あどけない瞳(ひとみ)が
+那雙天真的眼眸，
+
+熱(ねつ)を持(も)ってかすかに惑(まど)う
+帶著熱度，微微地流露迷惘。
+
+今日(きょう)までの二人(ふたり) 全(すべ)て もう
+至今為止的我們，
+
+飛(と)び越(こ)えそうで
+彷彿就要跨越那條界線。
+
+本音(ほんね)は曖昧(あいまい)なままでいい
+真心話就這樣保持曖昧也沒關係，
+
+思(おも)ってまだ遠(とお)くない
+我如此覺得，而且那一天已不遙遠。
+
+でもその涙(なみだ)
+可是那滴眼淚，
+
+理由(りゆう)を
+它背後的理由，
+
+独(ひと)り占(じ)めしたい
+我卻想獨自擁有。`;
+
+LR[12] = `めいっぱい背伸(せの)びしてきたけど
+雖然一直努力逞強、勉強讓自己成長，
+
+君(きみ)の前(まえ)じゃ上手(うま)くできない
+但在你面前卻怎麼也做不好。
+
+炭酸(たんさん)が抜(ぬ)けるより早(はや)いスピードで
+以比氣泡消散還要快的速度，
+
+変(か)わっていく気持(きも)ち
+這份心情不斷改變著。
+
+まだ自分(じぶん)でも気(き)づいてない
+甚至連自己都還沒有察覺。
+
+ねえ
+吶，
+
+最初(さいしょ)に望(のぞ)んだ未来(みらい)とは少(すこ)し違(ちが)うけれど
+雖然和最初所期望的未來有些不同，
+
+最後(さいご)はなにもいらない ただそばにいて
+到了最後我什麼都不要，只希望你在我身邊。
+
+君(きみ)がいる明日(あした)がいいなって思(おも)っていたって変(か)えられない
+希望明天有你在身旁，這份心意是無法改變的。
+
+伝(つた)えなくちゃ
+我必須把它傳達出去。
+
+できないことに目(め)を向(む)けて
+總是把目光放在自己做不到的事情上，
+
+ばかりの君(きみ)に教(おし)えたいよ
+我想告訴那樣的你。
+
+本当(ほんとう)に知(し)りたいのは本当(ほんとう)の君(きみ)で
+我真正想了解的，是最真實的你。
+
+もう正解(せいかい)がほしいわけじゃないって
+已經不是想要得到什麼正確答案了，
+
+気(き)づいてないんだね
+你還沒有察覺呢。
+
+季節(きせつ)が進(すす)むことをためらわないでね
+不要害怕季節向前推進喔。
+
+今(いま)までの全(すべ)てはいつかに繋(つな)がるから
+因為至今為止的一切，終將連結到某個未來。
+
+不器用(ぶきよう)ですれ違(ちが)って勘繰(かんぐ)ってばっか僕(ぼく)たちは
+笨拙的我們總是不斷錯過彼此、胡思亂想，
+
+言(い)えない言(い)えないなんて勝手(かって)なんだろう
+總說著「說不出口、說不出口」，其實只是任性罷了。
+
+最初(さいしょ)に
+最初的願望。
+
+最後(さいご)は
+而最後的答案是——。`;
+
+LR[13] = `まだ見(み)てて
+再多看著我一會兒吧
+
+僕(ぼく)が離(はな)れないように
+為了不讓我離開你
+
+抱(だ)きしめて
+請抱緊我
+
+僕(ぼく)が泣(な)きださないように
+為了不讓我哭出來
+
+追(お)い風(かぜ)が吹(ふ)き
+順風輕輕吹起
+
+糸(いと)が背筋(せすじ)通(とお)い、血液(けつえき)に届(とど)くころ
+當那條絲線沿著脊背穿過，抵達血液之時
+
+あぁ
+啊啊
+
+僕(ぼく)がまた飛(と)べそうな羽(はね)を見(み)つけたよ
+我又找到了彷彿能再次飛翔的翅膀
+
+もしさ
+如果啊
+
+君(きみ)もまだ巣立(すだ)つ前(まえ)ならば
+你也還未離巢啟程的話
+
+ねぇ一緒(いっしょ)に、飛(と)ぼうよ
+吶，一起飛吧
+
+よそみして
+別過頭去看別處
+
+巣立(すだ)ちを追(お)う風(かぜ)のように
+如同追逐離巢而去身影的風一般
+
+抱(だ)き上(あ)げて
+將我輕輕抱起
+
+僕(ぼく)が諦(あきら)めないように
+為了不讓我放棄
+
+首筋(くびすじ)
+頸邊
+
+解(ほつ)れ老(お)い始(はじ)め
+開始鬆開、開始老去
+
+糸(いと)が心臓(しんぞう)に届(とど)くまで
+直到那條絲線抵達心臟
+
+あぁ
+啊啊
+
+僕(ぼく)がまだ飛(と)べそうな理由(りゆう)を見(み)つけたよ
+我找到了自己仍能飛翔的理由
+
+だからもしも
+所以如果
+
+まだ君(きみ)が巣立(すだ)つ前(まえ)ならば
+你還未離巢啟程的話
+
+ねぇ一緒(いっしょ)に
+吶，一起吧
+
+この先(さき)が向(む)かい風(かぜ)と
+即使前方盡是逆風
+
+山々(やまやま)でおりなせど
+即使有重重高山阻擋去路
+
+血液(けつえき)泳(およ)ぐこの糸(いと)が君(きみ)のだと気(き)づくまで
+直到我察覺，流淌於血液中的這條絲線正是與你相連
+
+あぁ僕(ぼく)はまた言(い)い損(そこ)ねた言葉(ことば)をつらねて
+啊啊，我又把那些來不及說出口的話堆積起來
+
+あぁもしも
+啊啊，如果
+
+あなたならと思(おも)う日々(ひび)が増(ふ)えてきたから
+因為覺得「如果是你就好了」的日子愈來愈多了
+
+ねぇ
+吶
+
+あぁ君(きみ)となら、飛(と)べそうな未来(みらい)を見(み)つけたよ
+啊啊，和你在一起的話，我看見了彷彿能展翅飛翔的未來
+
+あぁもしも
+啊啊，如果
+
+まだ飛(と)べそうなら
+你也還能飛翔的話
+
+僕(ぼく)に言(い)ってよ
+請告訴我吧
+
+一緒(いっしょ)に
+一起
+
+「飛(と)ぼうよ」
+「一起飛吧」`;
+
+/* ── Song metadata + grammar ── */
+const SONGS = [
+  {id:1,title:"BLACK SHOUT",artist:"Roselia",group:"BanG Dream!",youtube:"7DTKwnWHFQE",note:"團體劇情第一章（Roselia 結成）",level:"N4",distribution:{N5:30,N4:35,N3:25,N2:8,N1:2},grammar:[
+    {id:"g1",pattern:"〜ている",example:"私(わたし)は此処(ここ)に今(いま) 生(い)きているから",meaning:"持續狀態（現在正在...）",level:"N5",learned:false},
+    {id:"g2",pattern:"〜でもいい",example:"黒(くろ)でもいい",meaning:"就算是...也沒關係",level:"N5",learned:false},
+    {id:"g3",pattern:"〜たい",example:"叶(かな)えたい夢(ゆめ) 勝(か)ち取(と)れ今(いま)すぐに",meaning:"想要（做某事）",level:"N5",learned:false},
+    {id:"g4",pattern:"〜んだ",example:"自分(じぶん)の手(て)で 切(き)り開(ひら)くんだ",meaning:"強調語氣（表達決心）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜ずに",example:"迷(まよ)わず進(すす)もう",meaning:"不...地（做另一件事）",level:"N3",learned:false}
+  ]},
+  {id:2,title:"LOUDER",artist:"Roselia",group:"BanG Dream!",youtube:"gZqpgrL6JTI",note:"活動「思緒相連、未完成之歌」（友希那與父親的羈絆）",level:"N3",distribution:{N5:28,N4:33,N3:27,N2:10,N1:2},grammar:[
+    {id:"g1",pattern:"〜たいの",example:"私(わたし)の音(おと)で try to... 伝(つた)えたいの",meaning:"想要...（の 帶說明或女性語氣）",level:"N5",learned:false},
+    {id:"g2",pattern:"〜てゆく／〜ていく",example:"輝(かがや)き溢(あふ)れゆくあなたの音(おと)は",meaning:"持續進行／逐漸...",level:"N4",learned:false},
+    {id:"g3",pattern:"〜なんて",example:"歌(うた)う資格(しかく)なんてないと背(せ)を向(む)けて",meaning:"竟然...（帶輕視或驚訝語氣）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜ように",example:"守(まも)るように 固(かた)く結(むす)び",meaning:"像是...般（比喻方式）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜ばいい",example:"脆(もろ)さは砕(くだ)ければいい",meaning:"只要...就好了",level:"N4",learned:false}
+  ]},
+  {id:3,title:"Re:birth day",artist:"Roselia",group:"BanG Dream!",youtube:"cqY4sBLd-_E",note:"象徵 Roselia 成員間建立信任，如同重生",level:"N3",distribution:{N5:25,N4:30,N3:28,N2:12,N1:5},grammar:[
+    {id:"g1",pattern:"〜そうな",example:"崩(くず)れそうな身体(からだ)を包(つつ)んで癒(い)した",meaning:"看起來快要...（樣態助動詞）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜ても",example:"苦(くる)しくても 信(しん)じてるわ",meaning:"就算...也（逆接條件）",level:"N4",learned:false},
+    {id:"g3",pattern:"〜ずに",example:"気持(きも)ちには向(む)き合(あ)わずに 弱(よわ)さを選(えら)び",meaning:"不...地（做另一件事）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜てゆく",example:"突(つ)き進(すす)んでゆくと 決(き)めた",meaning:"持續前進（動作持續延伸）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜ているから",example:"信(しん)じているわ",meaning:"因為一直相信著（持續狀態＋原因）",level:"N5",learned:false}
+  ]},
+  {id:4,title:"陽だまりロードナイト",artist:"Roselia",group:"BanG Dream!",youtube:"NCE8lemg38g",note:"活動「Don't leave me, Lisa!!!!」（莉莎的主場）",level:"N4",distribution:{N5:33,N4:37,N3:22,N2:6,N1:2},grammar:[
+    {id:"g1",pattern:"〜ても",example:"心(こころ)が悴(かじか)んでも「大丈夫(だいじょうぶ)」と言葉(ことば)でいつも抱(だ)きしめた",meaning:"就算...也（逆接條件）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜となって",example:"声(こえ)となって 表情(ひょうじょう)となって 導(みちび)いてく",meaning:"化作...、成為...（變化後的狀態）",level:"N4",learned:false},
+    {id:"g3",pattern:"〜てくれた",example:"初(はじ)めての気持(きも)ちを 教(おし)えてくれた",meaning:"為我...（別人為說話者做某事）",level:"N4",learned:false},
+    {id:"g4",pattern:"〜ように",example:"励(はげ)ます魔法(まほう)のように 囁(ささや)いたの",meaning:"像是...般（比喻方式）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜ていても",example:"離(はな)れていても 帰(かえ)る場所(ばしょ)がある",meaning:"就算（持續）...也依然...",level:"N4",learned:false}
+  ]},
+  {id:5,title:"熱色スターマイン",artist:"Roselia",group:"BanG Dream!",youtube:"DZNOUNsvWps",note:"活動「貫穿黑暗、青之星」（夏季煙火大會的熱情）",level:"N3",distribution:{N5:27,N4:33,N3:28,N2:9,N1:3},grammar:[
+    {id:"g1",pattern:"〜れば〜",example:"優(やさ)しさでなぞれば生(う)まれた",meaning:"如果...就會...（假定條件）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜ほどに",example:"目(め)が眩(くら)むほどに強(つよ)く",meaning:"到...的程度地",level:"N3",learned:false},
+    {id:"g3",pattern:"〜に乗り",example:"潮風(しおかぜ)に乗(の)り 言霊(ことだま)はやがて嵐(あらし)へと",meaning:"乘著...（搭載於某種力量）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜なんて",example:"不可能(ふかのう)なんてないわ",meaning:"什麼...之類的（帶否定或輕視語氣）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜よう",example:"熱帯夜(ねったいや) 泳(およ)ぐよう瞬(まばた)く",meaning:"如同...般（比喻樣態）",level:"N3",learned:false}
+  ]},
+  {id:6,title:"ONENESS",artist:"Roselia",group:"BanG Dream!",youtube:"m3mZynIlQe0",note:"活動「秋時雨中撐起的一把傘」（五人一心的開端）",level:"N3",distribution:{N5:25,N4:32,N3:28,N2:11,N1:4},grammar:[
+    {id:"g1",pattern:"〜のは",example:"孤独(こどく)を捨(す)てて掴(つか)むのは 出会(であ)う夢(ゆめ) 愛(あい)",meaning:"...的（東西）是...（名詞化後接主題）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜へと",example:"息(いき)づいた証(あかし)は 私(わたし)たちの oneness へと",meaning:"向著...而去（方向＋動態感）",level:"N3",learned:false},
+    {id:"g3",pattern:"〜合う",example:"惹(ひ)き合(あ)い 生(う)まれたキモチで",meaning:"互相...（雙方動作相互進行）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜たなら",example:"言葉(ことば)を色濃(いろこ)く並(なら)べたなら 境界線(きょうかいせん)は解(と)けて",meaning:"若（已經）...的話（完了假定）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜さえ〜ば",example:"信(しん)じ合(あ)えば",meaning:"只要...就...（最低條件）",level:"N3",learned:false}
+  ]},
+  {id:7,title:"Determination Symphony",artist:"Roselia",group:"BanG Dream!",youtube:"9xThAJp0h58",note:"活動「秋時雨中撐起的一把傘」（紗夜對妹妹日菜的情結與決心）",level:"N3",distribution:{N5:23,N4:30,N3:30,N2:13,N1:4},grammar:[
+    {id:"g1",pattern:"〜でも",example:"今(いま)はまだ無理(むり)でも （向(む)き合(あ)う定(さだ)めよ）",meaning:"就算...也（讓步逆接）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜に乗せて",example:"勇気(ゆうき)の祈(いの)りを音色(ねいろ)に乗(の)せて",meaning:"融入...之中、承載於...上",level:"N3",learned:false},
+    {id:"g3",pattern:"〜ずに",example:"捕(とら)われず Bring it on down",meaning:"不受...地（動作方式）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜がちに",example:"伏(ふ)し目(め)がちになって",meaning:"容易...、動不動就...（傾向）",level:"N2",learned:false},
+    {id:"g5",pattern:"〜じゃない",example:"これで終(お)わりじゃない",meaning:"不是...（否定強調）",level:"N5",learned:false}
+  ]},
+  {id:8,title:"Opera of the wasteland",artist:"Roselia",group:"BanG Dream!",youtube:"kzzXxwU3qo4",note:"劇情發展中，展現樂團如荒野歌劇般的宏大感",level:"N3",distribution:{N5:22,N4:30,N3:30,N2:13,N1:5},grammar:[
+    {id:"g1",pattern:"〜という〜は",example:"逃(に)げるという選択(せんたく)は 初(はじ)めから無(な)い",meaning:"所謂...的（引用或定義某概念）",level:"N3",learned:false},
+    {id:"g2",pattern:"〜たび（に）",example:"試練(しれん)の砦(とりで)を乗(の)り越(こ)える度(たび) 癒(い)す",meaning:"每當...時（重複動作觸發）",level:"N3",learned:false},
+    {id:"g3",pattern:"〜と共に",example:"仲間(なかま)と共(とも)に",meaning:"與...一起、伴隨著...",level:"N3",learned:false},
+    {id:"g4",pattern:"〜れる（受身）",example:"語(かた)り継(つ)がれる",meaning:"被...（被動形）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜ずに〜ず",example:"倒(たお)れず挫(くじ)けず 歩(あゆ)んだ旅路(たびじ)が",meaning:"不...也不...（並列否定）",level:"N3",learned:false}
+  ]},
+  {id:9,title:"－HEROIC ADVENT－",artist:"Roselia",group:"BanG Dream!",youtube:"HD--qY58fsM",note:"《卡片戰鬥!! 先導者》主題曲",level:"N4",distribution:{N5:30,N4:35,N3:25,N2:8,N1:2},grammar:[
+    {id:"g1",pattern:"〜てもいい",example:"涙(なみだ)流(なが)してもいいの",meaning:"...也可以、...也沒關係",level:"N5",learned:false},
+    {id:"g2",pattern:"〜こそ",example:"迷(まよ)う時(とき)こそ深呼吸(しんこきゅう)して Stand up!",meaning:"正是...才...（強調該時機）",level:"N3",learned:false},
+    {id:"g3",pattern:"〜なら",example:"恐(おそ)れが消(き)えるなら 傍(そば)にいる",meaning:"如果...的話（條件假定）",level:"N4",learned:false},
+    {id:"g4",pattern:"〜に乗せて",example:"渾身(こんしん)の一手(いって)を 今(いま) 夢(ゆめ)に乗(の)せて捧(ささ)ぐ",meaning:"承載於...之上（寄託）",level:"N3",learned:false},
+    {id:"g5",pattern:"〜ように",example:"手(て)を取(と)り合(あ)うように鳴(な)らす鼓動(こどう)",meaning:"像是...般（比喻動作方式）",level:"N3",learned:false}
+  ]},
+  {id:10,title:"軌跡",artist:"Roselia",group:"BanG Dream!",youtube:"WMuhZgcTeP4",note:"描繪成員間不變的感情（聲優更換紀念曲）",level:"N3",distribution:{N5:28,N4:32,N3:25,N2:11,N1:4},grammar:[
+    {id:"g1",pattern:"〜ように",example:"靴紐(くつひも)が解(ほど)ければ 結(むす)び直(なお)すように",meaning:"就像...那樣（比喻方式或目的）",level:"N3",learned:false},
+    {id:"g2",pattern:"〜ても〜ても",example:"別(わか)れても途切(とぎ)れても また繋(つな)がる為(ため)に",meaning:"就算...就算...也（多重讓步）",level:"N4",learned:false},
+    {id:"g3",pattern:"〜べく",example:"出逢(であ)うべく 人(ひと)は歩(あゆ)んでゆく",meaning:"為了...而（書面語，表目的）",level:"N2",learned:false},
+    {id:"g4",pattern:"〜そうならば",example:"哀(かな)しみで 胸(むね)の中(なか)溺(おぼ)れそうならば",meaning:"如果看起來快要...的話",level:"N4",learned:false},
+    {id:"g5",pattern:"〜てくれた",example:"大切(たいせつ)なものたちを残(のこ)してくれた",meaning:"為我...留下了...（別人施惠於說話者）",level:"N4",learned:false}
+  ]},
+  {id:11,title:"感情グラス",artist:"河瀨茉希",group:"上伊那ぼたん、酔へる姿は百合の花",youtube:"QgqGBh3oclU",note:"ED 主題曲",level:"N4",distribution:{N5:35,N4:38,N3:20,N2:6,N1:1},grammar:[
+    {id:"g1",pattern:"〜たくて",example:"私(わたし)の心(こころ) 揺(ゆ)らいだの隠(かく)したくて",meaning:"想要...所以...（欲望＋原因連接）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜やまない",example:"火照(ほて)りやまない",meaning:"止不住地...、不停地...（持續無法停止）",level:"N2",learned:false},
+    {id:"g3",pattern:"〜ように",example:"一口(ひとくち)味(あじ)わうように 名前(なまえ)を呼(よ)ぶ",meaning:"彷彿...般（比喻動作方式）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜そうな",example:"こぼれそうな想(おも)いが胸(むね)を満(み)たす",meaning:"看起來快要...的（樣態修飾名詞）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜なまま",example:"本音(ほんね)は曖昧(あいまい)なままでいい",meaning:"保持...的狀態（維持現狀）",level:"N3",learned:false}
+  ]},
+  {id:12,title:"芽吹くとき",artist:"yonige",group:"上伊那ぼたん、酔へる姿は百合の花",youtube:"e3YbPn7E1ko",note:"OP 主題曲",level:"N4",distribution:{N5:38,N4:35,N3:20,N2:6,N1:1},grammar:[
+    {id:"g1",pattern:"〜てきた",example:"めいっぱい背伸(せの)びしてきたけど",meaning:"一直持續...到現在（動作的積累）",level:"N4",learned:false},
+    {id:"g2",pattern:"〜けれど／〜けど",example:"少(すこ)し違(ちが)うけれど 最後(さいご)はなにもいらない",meaning:"雖然...但是...（逆接）",level:"N4",learned:false},
+    {id:"g3",pattern:"〜なくちゃ",example:"伝(つた)えなくちゃ",meaning:"必須...（義務、口語形）",level:"N4",learned:false},
+    {id:"g4",pattern:"〜わけじゃない",example:"もう正解(せいかい)がほしいわけじゃないって",meaning:"並不是...（否定特定解釋）",level:"N2",learned:false},
+    {id:"g5",pattern:"〜んだね",example:"気(き)づいてないんだね",meaning:"原來是...啊（確認、輕微驚訝）",level:"N4",learned:false}
+  ]},
+  {id:13,title:"飛ぼうよ",artist:"yama",group:"黄泉のツガイ",youtube:"E0GTLXTcIYs",note:"ED 主題曲",level:"N3",distribution:{N5:30,N4:32,N3:28,N2:8,N1:2},grammar:[
+    {id:"g1",pattern:"〜ないように",example:"僕(ぼく)が離(はな)れないように 抱(だ)きしめて",meaning:"為了不...而...（否定目的）",level:"N3",learned:false},
+    {id:"g2",pattern:"〜まで",example:"糸(いと)が心臓(しんぞう)に届(とど)くまで",meaning:"直到...為止",level:"N4",learned:false},
+    {id:"g3",pattern:"〜ならば",example:"君(きみ)もまだ巣立(すだ)つ前(まえ)ならば",meaning:"如果...的話（書面語假定條件）",level:"N3",learned:false},
+    {id:"g4",pattern:"〜そうな",example:"飛(と)べそうな羽(はね)を見(み)つけたよ",meaning:"看起來能...的（樣態修飾名詞）",level:"N4",learned:false},
+    {id:"g5",pattern:"〜てきたから",example:"あなたならと思(おも)う日々(ひび)が増(ふ)えてきたから",meaning:"因為（某狀態）一直在增加...",level:"N4",learned:false}
+  ]}
+];
+
+/* ── Furigana parser ── */
+function ruby(text) {
+  // 漢字(ふりがな) → <ruby>漢字<rt>ふりがな</rt></ruby>
+  return text
+    .replace(/\\/g, '') // strip markdown escapes
+    .replace(/([^\s(（【〔「」『』()）\[\]]+)\(([^()（）]+)\)/g,
+      (m, kanji, furi) => {
+        // Only if furi is hiragana/katakana (not Chinese or English)
+        if (/^[぀-ヿㇰ-ㇿ･-ﾟ]+$/.test(furi)) {
+          return `<ruby>${kanji}<rt>${furi}</rt></ruby>`;
+        }
+        return m; // keep as-is (Chinese in parens, English notes, etc.)
+      });
+}
+
+/* ── Parse raw lyrics string → [{ja, zh}] ── */
+function parseLyrics(raw) {
+  const results = [];
+  const blocks = raw.trim().split(/\n\n+/);
+  for (const block of blocks) {
+    const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+    if (!lines.length) continue;
+    if (lines.length >= 2) results.push({ja: lines[0], zh: lines[1]});
+    else results.push({ja: lines[0], zh: ''});
+  }
+  return results;
+}
+
+/* ── State ── */
+let learned = JSON.parse(localStorage.getItem(LKEY) || '{}');
+let cur = null, curTab = 'lyrics';
+const openArtists = new Set(SONGS.map(s => s.artist));
+
+function lk(sid, gid){ return sid+'_'+gid; }
+function isL(sid, gid){ return !!learned[lk(sid,gid)]; }
+function toggleL(sid, gid){
+  const k = lk(sid,gid);
+  if (learned[k]) delete learned[k]; else learned[k] = true;
+  localStorage.setItem(LKEY, JSON.stringify(learned));
+}
+function songDone(s){ return s.grammar.filter(g=>isL(s.id,g.id)).length; }
+function totalDone(){ return SONGS.reduce((a,s)=>a+songDone(s),0); }
+function totalAll(){ return SONGS.reduce((a,s)=>a+s.grammar.length,0); }
+
+/* ── Sort: numbers → English → 50-on ── */
+function songRank(title) {
+  const c = title.codePointAt(0);
+  if (c >= 0x30 && c <= 0x39) return 0;
+  if ((c >= 0x41 && c <= 0x5A)||(c >= 0x61 && c <= 0x7A)||(c >= 0xFF21 && c <= 0xFF5A)) return 1;
+  return 2;
+}
+function sortSongs(arr) {
+  return [...arr].sort((a,b) => {
+    const ra = songRank(a.title), rb = songRank(b.title);
+    if (ra !== rb) return ra - rb;
+    return a.title.localeCompare(b.title, 'ja');
+  });
+}
+
+/* ── Group by artist ── */
+function groupByArtist() {
+  const g = {};
+  SONGS.forEach(s => { if (!g[s.artist]) g[s.artist]=[]; g[s.artist].push(s); });
+  Object.keys(g).forEach(a => { g[a] = sortSongs(g[a]); });
+  return g;
+}
+
+/* ── Tab ── */
+function switchTab(t) {
+  curTab = t;
+  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.textContent==(t==='lyrics'?'歌詞':'文法')));
+  document.getElementById('lyrics-view').classList.toggle('show', t==='lyrics');
+  document.getElementById('grammar-view').classList.toggle('show', t==='grammar');
+}
+
+/* ── Mini ring SVG ── */
+function ring(d, t, size=24, sw=2) {
+  const R=(size-sw*2)/2, C=2*Math.PI*R, pct=t?d/t:0;
+  const dash=(pct*C).toFixed(1), gap=((1-pct)*C).toFixed(1), off=(C/4).toFixed(1);
+  const rc = d===t&&t>0?'#4caf7d':'#8b7cf8';
+  const cx=size/2, fs=size*0.27;
+  return `<svg viewBox="0 0 ${size} ${size}" style="width:${size}px;height:${size}px;flex-shrink:0">
+    <circle cx="${cx}" cy="${cx}" r="${R}" fill="none" stroke="#2e2e3e" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cx}" r="${R}" fill="none" stroke="${rc}" stroke-width="${sw}"
+      stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${off}" stroke-linecap="round"/>
+    <text x="${cx}" y="${cx}" text-anchor="middle" dominant-baseline="central"
+      fill="${rc}" font-size="${fs}" font-family="sans-serif">${d}/${t}</text>
+  </svg>`;
+}
+
+/* ── Render sidebar (tree) ── */
+function renderSidebar() {
+  const done = totalDone(), all = totalAll();
+  document.getElementById('prog-txt').textContent = done+' / '+all;
+  document.getElementById('prog-fill').style.width = (all ? Math.round(done/all*100) : 0)+'%';
+  updateMobBar();
+  const list = document.getElementById('song-list');
+  list.innerHTML = '';
+  const groups = groupByArtist();
+  Object.keys(groups).sort((a,b)=>a.localeCompare(b,'ja')).forEach(artist => {
+    const songs = groups[artist];
+    const aDone = songs.reduce((a,s)=>a+songDone(s),0);
+    const aAll = songs.reduce((a,s)=>a+s.grammar.length,0);
+    const isOpen = openArtists.has(artist);
+    const grp = document.createElement('div');
+    grp.className = 'artist-group';
+    grp.dataset.artist = artist;
+    const hd = document.createElement('div');
+    hd.className = 'artist-hd'+(isOpen?' open':'');
+    hd.innerHTML = `<span class="artist-arrow">▶</span>
+      <span style="flex:1">${artist}</span>
+      <span style="font-size:10px;opacity:.6">${aDone}/${aAll}</span>`;
+    hd.onclick = () => {
+      if (openArtists.has(artist)) openArtists.delete(artist); else openArtists.add(artist);
+      renderSidebar();
+    };
+    const sd = document.createElement('div');
+    sd.className = 'artist-songs'+(isOpen?'':' closed');
+    songs.forEach(s => {
+      const d = songDone(s), t = s.grammar.length;
+      const el = document.createElement('div');
+      el.className = 's-item'+(cur&&cur.id===s.id?' active':'');
+      el.innerHTML = ring(d,t)+`<div class="s-info">
+        <div class="s-title">${s.title}</div>
+        <div class="s-meta"><span class="lv-badge" style="background:${DC[s.level]};color:${TC[s.level]}">${s.level}</span></div>
+      </div>`;
+      el.onclick = () => selectSong(s);
+      sd.appendChild(el);
+    });
+    grp.appendChild(hd); grp.appendChild(sd);
+    list.appendChild(grp);
+  });
+}
+
+/* ── Home page ── */
+function renderHome() {
+  cur = null;
+  document.getElementById('m-head').style.display = 'none';
+  document.getElementById('tab-bar').style.display = 'none';
+  document.getElementById('lyrics-view').classList.remove('show');
+  document.getElementById('grammar-view').classList.remove('show');
+  const hv = document.getElementById('home-view');
+  hv.classList.add('show');
+  const done = totalDone(), all = totalAll(), pct = all?Math.round(done/all*100):0;
+  const lvC={N5:0,N4:0,N3:0,N2:0,N1:0}, lvD={N5:0,N4:0,N3:0,N2:0,N1:0};
+  SONGS.forEach(s=>s.grammar.forEach(g=>{lvC[g.level]++;if(isL(s.id,g.id))lvD[g.level]++;}));
+  const groups = groupByArtist();
+  const artists = Object.keys(groups).sort((a,b)=>a.localeCompare(b,'ja'));
+  hv.innerHTML = `
+    <div class="home-title">歌詞で学ぶ 日本語</div>
+    <div class="home-sub">透過喜愛的歌曲學習日文文法</div>
+    <div class="home-total">
+      <div class="home-nums">${done} <span style="font-size:16px;color:var(--sub);font-weight:400">/ ${all} 句型</span></div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:8px 0">
+        <div style="width:${pct}%;height:100%;background:var(--accent);border-radius:3px"></div>
+      </div>
+      <div style="font-size:11px;color:var(--sub)">整體文法完成度 ${pct}%</div>
+      <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+        ${['N5','N4','N3','N2','N1'].map(lv=>`
+          <div style="flex:1;min-width:48px">
+            <div style="font-size:10px;font-weight:700;color:${TC[lv]};margin-bottom:3px">${lv}</div>
+            <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">
+              <div style="width:${lvC[lv]?Math.round(lvD[lv]/lvC[lv]*100):0}%;height:100%;background:${BC[lv]};border-radius:2px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px">${lvD[lv]}/${lvC[lv]}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="home-section">歌手 / 團體</div>
+    <div class="artist-cards">
+      ${artists.map(artist=>{
+        const songs=groups[artist];
+        const aDone=songs.reduce((a,s)=>a+songDone(s),0);
+        const aAll=songs.reduce((a,s)=>a+s.grammar.length,0);
+        const aPct=aAll?Math.round(aDone/aAll*100):0;
+        const grp=songs[0].group||'';
+        const dist={N5:0,N4:0,N3:0,N2:0,N1:0};
+        songs.forEach(s=>['N5','N4','N3','N2','N1'].forEach(lv=>{dist[lv]+=(s.distribution[lv]||0);}));
+        const dTotal=Object.values(dist).reduce((a,b)=>a+b,0);
+        return `<div class="ac" onclick="openArtistGroup('${artist.replace(/'/g,"\\'")}')" >
+          <div class="ac-name">${artist}</div>
+          <div class="ac-meta">${grp}　${songs.length} 首歌・${aAll} 句型</div>
+          <div class="ac-pl"><span>文法進度</span><span>${aDone}/${aAll} (${aPct}%)</span></div>
+          <div class="ac-pb"><div class="ac-pf" style="width:${aPct}%"></div></div>
+          <div class="ac-dist">${['N5','N4','N3','N2','N1'].map(lv=>
+            `<span style="width:${dTotal?Math.round(dist[lv]/dTotal*100):0}%;background:${BC[lv]}" title="${lv}"></span>`
+          ).join('')}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  renderSidebar();
+}
+
+function openArtistGroup(artist) {
+  openArtists.add(artist);
+  renderSidebar();
+  // 展開後捲動到該歌手群組
+  requestAnimationFrame(() => {
+    const el = document.querySelector(`[data-artist="${CSS.escape(artist)}"]`);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+function openMobileSidebar() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('overlay').classList.add('hidden');
+}
+
+function updateMobBar() {
+  const done = totalDone(), all = totalAll();
+  const mp = document.getElementById('mob-prog');
+  if (mp) mp.textContent = done + '/' + all;
+}
+
+/* ── Render song header ── */
+function renderHeader(s) {
+  document.getElementById('song-name').innerHTML =
+    `${s.title} <span class="lv-badge lv-${s.level}" style="background:${DC[s.level]};color:${TC[s.level]}">${s.level}</span>`;
+  document.getElementById('song-artist').textContent = `${s.artist}　${s.group}　${s.note}`;
+  const db = document.getElementById('dist-bar');
+  const d = s.distribution;
+  db.innerHTML = ['N5','N4','N3','N2','N1'].map(lv =>
+    `<span style="width:${d[lv]||0}%;background:${BC[lv]}" title="${lv} ${d[lv]}%"></span>`
+  ).join('');
+  const yw = document.getElementById('yt-wrap');
+  if (s.youtube) {
+    document.getElementById('yt-link').href = `https://www.youtube.com/watch?v=${s.youtube}`;
+    document.getElementById('yt-thumb').src = `https://img.youtube.com/vi/${s.youtube}/mqdefault.jpg`;
+    yw.style.display = 'block';
+  } else {
+    yw.style.display = 'none';
+  }
+}
+
+/* ── Render lyrics ── */
+function renderLyrics(s) {
+  const view = document.getElementById('lyrics-view');
+  const raw = LR[s.id];
+  if (!raw) { view.innerHTML='<div style="padding:40px 20px;color:var(--sub);text-align:center">歌詞資料尚未加入</div>'; return; }
+  const pairs = parseLyrics(raw);
+  view.innerHTML = pairs.map(p => {
+    const jaHtml = ruby(p.ja);
+    if (!p.zh) return `<div class="lyric-block"><div class="lyric-ja lyric-single">${jaHtml}</div></div>`;
+    return `<div class="lyric-block">
+      <div class="lyric-ja">${jaHtml}</div>
+      <div class="lyric-zh">${p.zh}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Render grammar ── */
+function renderGrammar(s) {
+  const view = document.getElementById('grammar-view');
+  view.innerHTML = '';
+  s.grammar.forEach(g => {
+    const lnd = isL(s.id, g.id);
+    const card = document.createElement('div');
+    card.className = 'g-card'+(lnd?' learned':'');
+    card.innerHTML = `
+      <div class="g-top">
+        <div class="g-pattern">${g.pattern}</div>
+        <span class="g-badge lv-${g.level}" style="background:${DC[g.level]};color:${TC[g.level]}">${g.level}</span>
+      </div>
+      <div class="g-example">${ruby(g.example)}</div>
+      <div class="g-meaning">${g.meaning}</div>
+      <div class="g-check">
+        <div class="g-chk-icon">${lnd?'✓':''}</div>
+        ${lnd?'已學會':'點擊標記'}
+      </div>`;
+    card.onclick = () => {
+      toggleL(s.id, g.id);
+      renderGrammar(s);
+      renderSidebar();
+    };
+    view.appendChild(card);
+  });
+}
+
+/* ── Select song ── */
+function selectSong(s) {
+  cur = s;
+  closeMobileSidebar();
+  document.getElementById('home-view').classList.remove('show');
+  document.getElementById('m-head').style.display = '';
+  document.getElementById('tab-bar').style.display = '';
+  renderHeader(s);
+  renderLyrics(s);
+  renderGrammar(s);
+  switchTab(curTab);
+  renderSidebar();
+}
+
+/* ── Init ── */
+renderHome();
+</script>
+</body>
+</html>
