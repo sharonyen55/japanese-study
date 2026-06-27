@@ -18,6 +18,7 @@ body{font-family:'Segoe UI','Noto Sans TC',sans-serif;background:var(--bg);color
 /* ─ Sidebar ─ */
 #sidebar{width:260px;min-width:260px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .25s,min-width .25s}
 #sidebar.collapsed{width:40px;min-width:40px}
+#sb-content{display:flex;flex-direction:column;flex:1;overflow:hidden}
 #sidebar.collapsed #sb-content{display:none}
 #sidebar.collapsed #sb-toggle-icon{transform:rotate(180deg)}
 #sb-head{padding:12px 10px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;cursor:pointer}
