@@ -1737,21 +1737,33 @@ function loadYouTubePlayer(videoId) {
   }
 }
 
+function showYtFallback(videoId) {
+  if (ytPlayer) { try { ytPlayer.destroy(); } catch(e){} ytPlayer = null; }
+  document.getElementById('yt-player-box').style.display = 'none';
+  var fb = document.getElementById('yt-fallback');
+  fb.href = 'https://www.youtube.com/watch?v=' + videoId;
+  document.getElementById('yt-thumb').src = 'https://img.youtube.com/vi/' + videoId + '/mqdefault.jpg';
+  fb.style.display = 'block';
+}
+
 function _createPlayer(videoId) {
   document.getElementById('yt-player-box').innerHTML = '';
+  document.getElementById('yt-player-box').style.display = '';
   ytPlayer = new YT.Player('yt-player-box', {
     width: '100%', height: '100%',
     videoId: videoId,
     playerVars: {rel: 0, modestbranding: 1},
     events: {
+      onReady: function() {
+        // 若 3 秒後還是 unstarted(-1)，代表影片禁止嵌入
+        setTimeout(function() {
+          if (ytPlayer && ytPlayer.getPlayerState && ytPlayer.getPlayerState() === -1) {
+            showYtFallback(videoId);
+          }
+        }, 3000);
+      },
       onError: function(e) {
-        if (e.data === 101 || e.data === 150 || e.data === 100) {
-          document.getElementById('yt-player-box').style.display = 'none';
-          var fb = document.getElementById('yt-fallback');
-          fb.href = 'https://www.youtube.com/watch?v=' + videoId;
-          document.getElementById('yt-thumb').src = 'https://img.youtube.com/vi/' + videoId + '/mqdefault.jpg';
-          fb.style.display = 'block';
-        }
+        showYtFallback(videoId);
       }
     }
   });
