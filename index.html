@@ -246,6 +246,8 @@ rt{font-size:.6em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
 
 <script>
 const LKEY = 'jplearn_v2';
+// ── 同步進度（由 Claude 更新，請勿手動編輯）──
+const SYNCED_PROGRESS = {"1_g1":true,"1_g2":true,"1_g3":true,"1_g4":true,"1_g5":true,"1_vv1":true,"1_vv3":true,"1_vv4":true,"1_vv6":true,"16_g1":true,"16_g2":true,"16_g4":true,"16_g5":true};
 const DC = {N5:'#1a3a2a',N4:'#1a2a3a',N3:'#3a2a10',N2:'#3a2010',N1:'#3a1010'};
 const TC = {N5:'#4caf7d',N4:'#5b9bd5',N3:'#e6a817',N2:'#e07050',N1:'#cc4444'};
 const BC = {N5:'#4caf7d',N4:'#5b9bd5',N3:'#e6a817',N2:'#e07050',N1:'#cc4444'};
@@ -2983,6 +2985,7 @@ function parseLyrics(raw) {
 }
 
 /* ── State ── */
+if (SYNCED_PROGRESS) { localStorage.setItem(LKEY, JSON.stringify(SYNCED_PROGRESS)); }
 let learned = JSON.parse(localStorage.getItem(LKEY) || '{}');
 let cur = null, curTab = 'lyrics';
 const openArtists = new Set(SONGS.map(s => s.artist));
