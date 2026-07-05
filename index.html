@@ -2986,7 +2986,11 @@ function renderHome() {
   const done = totalDone(), all = totalAll(), pct = all?Math.round(done/all*100):0;
   const vDone = totalVocabDone(), vAll = totalVocabAll(), vPct = vAll?Math.round(vDone/vAll*100):0;
   const lvC={N5:0,N4:0,N3:0,N2:0,N1:0}, lvD={N5:0,N4:0,N3:0,N2:0,N1:0};
-  SONGS.forEach(s=>s.grammar.forEach(g=>{lvC[g.level]++;if(isL(s.id,g.id))lvD[g.level]++;}));
+  const vlvC={N5:0,N4:0,N3:0,N2:0,N1:0}, vlvD={N5:0,N4:0,N3:0,N2:0,N1:0};
+  SONGS.forEach(s=>{
+    s.grammar.forEach(g=>{lvC[g.level]++;if(isL(s.id,g.id))lvD[g.level]++;});
+    (s.vocab||[]).forEach(v=>{vlvC[v.level]++;if(isVL(s.id,v.id))vlvD[v.level]++;});
+  });
   const groups = groupByArtist();
   const artists = Object.keys(groups).sort((a,b)=>a.localeCompare(b,'ja'));
   hv.innerHTML = `
@@ -3014,11 +3018,17 @@ function renderHome() {
       <div style="display:flex;gap:12px;flex-wrap:wrap">
         ${['N5','N4','N3','N2','N1'].map(lv=>`
           <div style="flex:1;min-width:48px">
-            <div style="font-size:10px;font-weight:700;color:${TC[lv]};margin-bottom:3px">${lv}</div>
+            <div style="font-size:10px;font-weight:700;color:${TC[lv]};margin-bottom:4px">${lv}</div>
+            <div style="font-size:9px;color:var(--muted);margin-bottom:2px">文法</div>
             <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">
               <div style="width:${lvC[lv]?Math.round(lvD[lv]/lvC[lv]*100):0}%;height:100%;background:${BC[lv]};border-radius:2px"></div>
             </div>
-            <div style="font-size:10px;color:var(--sub);margin-top:2px">${lvD[lv]}/${lvC[lv]}</div>
+            <div style="font-size:10px;color:var(--sub);margin:2px 0 5px">${lvD[lv]}/${lvC[lv]}</div>
+            <div style="font-size:9px;color:var(--muted);margin-bottom:2px">單字</div>
+            <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">
+              <div style="width:${vlvC[lv]?Math.round(vlvD[lv]/vlvC[lv]*100):0}%;height:100%;background:#5b9bd5;border-radius:2px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px">${vlvD[lv]}/${vlvC[lv]}</div>
           </div>`).join('')}
       </div>
     </div>
