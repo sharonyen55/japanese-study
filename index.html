@@ -92,6 +92,28 @@ rt{font-size:.6em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
 .g-chk-icon{width:15px;height:15px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:8px}
 #empty{padding:60px 20px;text-align:center;color:var(--sub);font-size:14px;grid-column:1/-1}
 
+/* ─ Vocab ─ */
+#vocab-view{flex:1;overflow-y:auto;padding:18px 22px;display:none}
+#vocab-view.show{display:block}
+.v-filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.v-filter-sel{background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 10px;font-size:12px;cursor:pointer;outline:none}
+.v-filter-sel:focus{border-color:var(--accent)}
+.v-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.v-card{height:150px;perspective:700px;cursor:pointer}
+.v-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .4s}
+.v-card.flipped .v-inner{transform:rotateY(180deg)}
+.v-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;border:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 12px;gap:4px}
+.v-back{transform:rotateY(180deg)}
+.v-card.learned .v-face{background:var(--green);border-color:var(--green-b)}
+.v-word{font-size:26px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--text)}
+.v-reading{font-size:12px;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
+.v-meaning{font-size:13px;font-weight:600;color:var(--text);text-align:center;line-height:1.4}
+.v-ex{font-size:11px;color:var(--sub);text-align:center;line-height:1.7;font-family:'Noto Sans JP',sans-serif;margin-top:4px}
+.v-chk-btn{margin-top:6px;font-size:10px;color:var(--sub);display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:20px;padding:3px 9px;cursor:pointer;transition:background .15s,border-color .15s}
+.v-chk-btn:hover{background:rgba(255,255,255,.12);border-color:var(--accent)}
+.v-card.learned .v-chk-btn{color:var(--n5);border-color:var(--green-b)}
+.v-empty{padding:60px 20px;text-align:center;color:var(--sub);font-size:14px}
+
 /* ─ Artist tree ─ */
 .artist-group{}
 .artist-hd{padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;user-select:none;transition:background .15s;border-bottom:1px solid var(--border)}
@@ -153,6 +175,8 @@ rt{font-size:.6em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
   #tab-bar .tab{padding:10px 16px;font-size:13px}
   #lyrics-view{padding:16px}
   #grammar-view{padding:14px 12px;grid-template-columns:1fr}
+  #vocab-view{padding:14px 12px}
+  .v-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   #home-view{padding:16px}
   .artist-cards{grid-template-columns:1fr}
   .home-total{padding:14px 16px}
@@ -212,9 +236,11 @@ rt{font-size:.6em;color:var(--sub);font-family:'Noto Sans JP',sans-serif}
   <div id="tab-bar">
     <div class="tab active" onclick="switchTab('lyrics')">歌詞</div>
     <div class="tab" onclick="switchTab('grammar')">文法</div>
+    <div class="tab" onclick="switchTab('vocab')">單字</div>
   </div>
   <div id="lyrics-view"><div style="padding:60px 20px;text-align:center;color:var(--sub)">從左側選擇歌曲</div></div>
   <div id="grammar-view"><div id="empty">從左側選擇歌曲，開始學習文法句型</div></div>
+  <div id="vocab-view"></div>
   <div id="home-view"></div>
 </main>
 
@@ -2633,6 +2659,13 @@ const SONGS = [
     {id:"g3",pattern:"〜たい",example:"叶(かな)えたい夢(ゆめ) 勝(か)ち取(と)れ今(いま)すぐに",exampleZh:"想要實現的夢，現在就去奪取吧",meaning:"想要（做某事）",level:"N5",learned:false},
     {id:"g4",pattern:"〜んだ",example:"自分(じぶん)の手(て)で 切(き)り開(ひら)くんだ",exampleZh:"要用自己的手開拓出去",meaning:"強調語氣（表達決心）",level:"N4",learned:false},
     {id:"g5",pattern:"〜ずに",example:"怯(おび)えずに今(いま)",exampleZh:"現在毫不恐懼地",meaning:"不...地（做另一件事）",level:"N3",learned:false}
+  ],vocab:[
+    {id:"v1",word:"覚悟",reading:"かくご",meaning:"覺悟、決心",level:"N2",example:"覚悟(かくご)で踏(ふ)み出(だ)し",exampleZh:"帶著覺悟踏出腳步"},
+    {id:"v2",word:"不条理",reading:"ふじょうり",meaning:"不合理、荒謬",level:"N2",example:"不条理(ふじょうり)を壊(こわ)し",exampleZh:"打破這世間的不合理"},
+    {id:"v3",word:"嫉妬",reading:"しっと",meaning:"嫉妒、妒忌",level:"N3",example:"邪魔(じゃま)するもの (嫉妬(しっと))",exampleZh:"阻礙我的事物（嫉妒）"},
+    {id:"v4",word:"本能",reading:"ほんのう",meaning:"本能、天性",level:"N3",example:"私(わたし)の色(いろ) (本能(ほんのう))",exampleZh:"我原有的色彩（本能）"},
+    {id:"v5",word:"衝動",reading:"しょうどう",meaning:"衝動、強烈的衝力",level:"N3",example:"振(ふ)り落(お)として (衝動(しょうどう))",exampleZh:"將其甩開（衝動）"},
+    {id:"v6",word:"自由",reading:"じゆう",meaning:"自由",level:"N4",example:"自由(じゆう)を奪(うば)ってく",exampleZh:"將自由奪走"}
   ]},
   {id:2,title:"LOUDER",artist:"Roselia",group:"BanG Dream!",youtube:"gZqpgrL6JTI",note:"活動「思緒相連、未完成之歌」（友希那與父親的羈絆）",level:"N3",distribution:{N5:28,N4:33,N3:27,N2:10,N1:2},grammar:[
     {id:"g1",pattern:"〜たいの",example:"私(わたし)の音(おと)で try to... 伝(つた)えたいの",exampleZh:"想要用我的聲音傳達...",meaning:"想要...（の 帶說明或女性語氣）",level:"N5",learned:false},
@@ -2724,6 +2757,12 @@ const SONGS = [
     {id:"g3",pattern:"〜のよ",example:"未来永劫(みらいえいごう) 咲(さ)き誇(ほこ)るのよ",exampleZh:"直到未來永恆都要盡情綻放",meaning:"の＋よ 強調說明（女性語氣）",level:"N4",learned:false},
     {id:"g4",pattern:"〜ながらも",example:"極限(きょくげん)を辿(たど)りながらも",exampleZh:"即便在追尋極限的過程中",meaning:"雖然...但是（讓步逆接）",level:"N3",learned:false},
     {id:"g5",pattern:"〜はしない",example:"崩(くず)れはしないの",exampleZh:"是絕對不會崩解的",meaning:"絕對不...（強調否定）",level:"N2",learned:false}
+  ],vocab:[
+    {id:"v1",word:"己",reading:"おのれ",meaning:"自己（文語，強調自身）",level:"N2",example:"己(おのれ)を照(て)らしゆくわ",exampleZh:"都會持續照耀著自己"},
+    {id:"v2",word:"意志",reading:"いし",meaning:"意志、意念",level:"N3",example:"抱(いだ)く意志(いし)が導(みちび)くまま",exampleZh:"隨心所懷抱的意志引導"},
+    {id:"v3",word:"極限",reading:"きょくげん",meaning:"極限、極致",level:"N2",example:"極限(きょくげん)を辿(たど)りながらも",exampleZh:"即便在追尋極限的過程中"},
+    {id:"v4",word:"未来永劫",reading:"みらいえいごう",meaning:"永遠、萬古長遠",level:"N1",example:"未来永劫(みらいえいごう) 咲(さ)き誇(ほこ)るのよ",exampleZh:"直到未來永恆都要盡情綻放"},
+    {id:"v5",word:"崩れる",reading:"くずれる",meaning:"崩塌、崩解、瓦解",level:"N3",example:"崩(くず)れはしないの",exampleZh:"是絕對不會崩解的"}
   ]},
   {id:15,title:"Neo-Aspect",artist:"Roselia",group:"BanG Dream!",youtube:"Zw7u9uW4pzE",note:"描繪在孤獨與黑暗中，透過音樂與彼此支撐，打開心扉的故事",level:"N3",distribution:{N5:27,N4:32,N3:28,N2:10,N1:3},grammar:[
     {id:"g1",pattern:"〜ように",example:"抱(だ)きしめるように歌(うた)うの",exampleZh:"如同擁抱一般地歌唱著",meaning:"像是...般（比喻動作方式）",level:"N3",learned:false},
@@ -2731,6 +2770,12 @@ const SONGS = [
     {id:"g3",pattern:"〜ていく",example:"飲(の)まれていく意志(いし) 薄(うす)れだす",exampleZh:"意志逐漸被吞噬 變得稀薄",meaning:"逐漸...（動作持續延伸）",level:"N4",learned:false},
     {id:"g4",pattern:"〜ておく",example:"扉(とびら)は開(あ)けておくから",exampleZh:"我會將門扉一直為你敞開",meaning:"事先（為你）做好...（預備性動作）",level:"N3",learned:false},
     {id:"g5",pattern:"〜たって",example:"涙(なみだ)したって 此処(ここ)にいるよ",exampleZh:"即便流下淚水 我也會待在這裡",meaning:"就算...也（口語讓步逆接）",level:"N3",learned:false}
+  ],vocab:[
+    {id:"v1",word:"扉",reading:"とびら",meaning:"門扉（常比喻心門）",level:"N3",example:"扉(とびら)は開(あ)けておくから",exampleZh:"因為心門我會為你開著"},
+    {id:"v2",word:"涙",reading:"なみだ",meaning:"淚水、眼淚",level:"N4",example:"涙(なみだ)したって 此処(ここ)にいるよ",exampleZh:"就算流淚，我也在這裡陪著你"},
+    {id:"v3",word:"意志",reading:"いし",meaning:"意志、意念",level:"N3",example:"飲(の)まれていく意志(いし) 薄(うす)れだす",exampleZh:"逐漸被吞噬的意志，開始消散"},
+    {id:"v4",word:"抱きしめる",reading:"だきしめる",meaning:"緊緊擁抱",level:"N3",example:"抱(だ)きしめるように歌(うた)うの",exampleZh:"如同緊緊擁抱一般地歌唱著"},
+    {id:"v5",word:"振り向く",reading:"ふりむく",meaning:"回頭、回望",level:"N3",example:"ふりむかずにいた",exampleZh:"一直不曾回頭張望"}
   ]},
   {id:16,title:"BRAVE JEWEL",artist:"Roselia",group:"BanG Dream!",youtube:"lq_YHdwbxrg",note:"激勵自己勇敢面對困難的宣言，純度極高的思念將化作寶石",level:"N3",distribution:{N5:28,N4:32,N3:27,N2:10,N1:3},grammar:[
     {id:"g1",pattern:"〜ないで",example:"自分(じぶん)を責(せ)めないで 抱(だ)きしめなさい",exampleZh:"不要責備自己，請試著擁抱這份不完美",meaning:"不要...（否定命令，較温和）",level:"N5",learned:false},
@@ -2857,11 +2902,13 @@ function groupByArtist() {
 }
 
 /* ── Tab ── */
+const TAB_NAMES = {lyrics:'歌詞', grammar:'文法', vocab:'單字'};
 function switchTab(t) {
   curTab = t;
-  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.textContent==(t==='lyrics'?'歌詞':'文法')));
+  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.textContent===TAB_NAMES[t]));
   document.getElementById('lyrics-view').classList.toggle('show', t==='lyrics');
   document.getElementById('grammar-view').classList.toggle('show', t==='grammar');
+  document.getElementById('vocab-view').classList.toggle('show', t==='vocab');
 }
 
 /* ── Mini ring SVG ── */
@@ -2930,6 +2977,7 @@ function renderHome() {
   document.getElementById('tab-bar').style.display = 'none';
   document.getElementById('lyrics-view').classList.remove('show');
   document.getElementById('grammar-view').classList.remove('show');
+  document.getElementById('vocab-view').classList.remove('show');
   const hv = document.getElementById('home-view');
   hv.classList.add('show');
   const done = totalDone(), all = totalAll(), pct = all?Math.round(done/all*100):0;
@@ -3097,6 +3145,82 @@ function renderGrammar(s) {
   });
 }
 
+/* ── Vocab helpers ── */
+let vocabFilters = {level:'all', status:'all'};
+function vlk(sid, vid){ return sid+'_v'+vid; }
+function isVL(sid, vid){ return !!learned[vlk(sid,vid)]; }
+function toggleVL(sid, vid){
+  const k = vlk(sid,vid);
+  if (learned[k]) delete learned[k]; else learned[k] = true;
+  localStorage.setItem(LKEY, JSON.stringify(learned));
+}
+
+/* ── Render vocab ── */
+function renderVocab(s) {
+  const view = document.getElementById('vocab-view');
+  const vocab = s.vocab || [];
+  if (!vocab.length) {
+    view.innerHTML = '<div class="v-empty">這首歌尚未新增單字資料</div>';
+    return;
+  }
+  const filtered = vocab.filter(v => {
+    if (vocabFilters.level !== 'all' && v.level !== vocabFilters.level) return false;
+    if (vocabFilters.status === 'unlearned' && isVL(s.id, v.id)) return false;
+    if (vocabFilters.status === 'learned' && !isVL(s.id, v.id)) return false;
+    return true;
+  });
+  const done = vocab.filter(v => isVL(s.id, v.id)).length;
+  const levels = [...new Set(vocab.map(v => v.level))].sort();
+  view.innerHTML = `
+    <div class="v-filters">
+      <select class="v-filter-sel" onchange="vocabFilters.level=this.value;renderVocab(cur)">
+        <option value="all" ${vocabFilters.level==='all'?'selected':''}>全部等級</option>
+        ${['N5','N4','N3','N2','N1'].filter(lv=>levels.includes(lv)).map(lv=>
+          `<option value="${lv}" ${vocabFilters.level===lv?'selected':''}>${lv}</option>`
+        ).join('')}
+      </select>
+      <select class="v-filter-sel" onchange="vocabFilters.status=this.value;renderVocab(cur)">
+        <option value="all" ${vocabFilters.status==='all'?'selected':''}>全部</option>
+        <option value="unlearned" ${vocabFilters.status==='unlearned'?'selected':''}>未學</option>
+        <option value="learned" ${vocabFilters.status==='learned'?'selected':''}>已學</option>
+      </select>
+      <span style="font-size:12px;color:var(--sub);margin-left:auto">${done} / ${vocab.length} 已學</span>
+    </div>
+    <div class="v-grid" id="v-grid"></div>`;
+  const grid = view.querySelector('#v-grid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="v-empty" style="grid-column:1/-1">沒有符合條件的單字</div>';
+    return;
+  }
+  filtered.forEach(v => {
+    const lnd = isVL(s.id, v.id);
+    const card = document.createElement('div');
+    card.className = 'v-card' + (lnd ? ' learned' : '');
+    card.innerHTML = `
+      <div class="v-inner">
+        <div class="v-face v-front">
+          <div class="v-word">${v.word}</div>
+          <div class="v-reading">${v.reading}</div>
+          <span class="g-badge lv-${v.level}" style="background:${DC[v.level]};color:${TC[v.level]};margin-top:6px">${v.level}</span>
+        </div>
+        <div class="v-face v-back">
+          <div class="v-meaning">${v.meaning}</div>
+          <div class="v-ex">${ruby(v.example)}<br><span style="color:var(--muted)">${v.exampleZh}</span></div>
+          <button class="v-chk-btn">
+            <span>${lnd?'✓':''}</span>${lnd?'已學會':'標記學會'}
+          </button>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => card.classList.toggle('flipped'));
+    card.querySelector('.v-chk-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      toggleVL(s.id, v.id);
+      renderVocab(s);
+    });
+    grid.appendChild(card);
+  });
+}
+
 /* ── Select song ── */
 function selectSong(s) {
   cur = s;
@@ -3107,6 +3231,7 @@ function selectSong(s) {
   renderHeader(s);
   renderLyrics(s);
   renderGrammar(s);
+  renderVocab(s);
   switchTab(curTab);
   renderSidebar();
 }
