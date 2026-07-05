@@ -2877,6 +2877,9 @@ function toggleL(sid, gid){
 function songDone(s){ return s.grammar.filter(g=>isL(s.id,g.id)).length; }
 function totalDone(){ return SONGS.reduce((a,s)=>a+songDone(s),0); }
 function totalAll(){ return SONGS.reduce((a,s)=>a+s.grammar.length,0); }
+function songVocabDone(s){ return (s.vocab||[]).filter(v=>isVL(s.id,v.id)).length; }
+function totalVocabDone(){ return SONGS.reduce((a,s)=>a+songVocabDone(s),0); }
+function totalVocabAll(){ return SONGS.reduce((a,s)=>a+(s.vocab||[]).length,0); }
 
 /* ── Sort: numbers → English → 50-on ── */
 function songRank(title) {
@@ -2981,6 +2984,7 @@ function renderHome() {
   const hv = document.getElementById('home-view');
   hv.classList.add('show');
   const done = totalDone(), all = totalAll(), pct = all?Math.round(done/all*100):0;
+  const vDone = totalVocabDone(), vAll = totalVocabAll(), vPct = vAll?Math.round(vDone/vAll*100):0;
   const lvC={N5:0,N4:0,N3:0,N2:0,N1:0}, lvD={N5:0,N4:0,N3:0,N2:0,N1:0};
   SONGS.forEach(s=>s.grammar.forEach(g=>{lvC[g.level]++;if(isL(s.id,g.id))lvD[g.level]++;}));
   const groups = groupByArtist();
@@ -2989,12 +2993,25 @@ function renderHome() {
     <div class="home-title">歌詞で学ぶ 日本語</div>
     <div class="home-sub">透過喜愛的歌曲學習日文文法</div>
     <div class="home-total">
-      <div class="home-nums">${done} <span style="font-size:16px;color:var(--sub);font-weight:400">/ ${all} 句型</span></div>
-      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:8px 0">
-        <div style="width:${pct}%;height:100%;background:var(--accent);border-radius:3px"></div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px">
+        <div style="flex:1;min-width:120px">
+          <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.4px;margin-bottom:4px">文法句型</div>
+          <div style="font-size:22px;font-weight:700;color:var(--accent)">${done} <span style="font-size:13px;color:var(--sub);font-weight:400">/ ${all}</span></div>
+          <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:6px 0">
+            <div style="width:${pct}%;height:100%;background:var(--accent);border-radius:3px"></div>
+          </div>
+          <div style="font-size:11px;color:var(--sub)">完成度 ${pct}%</div>
+        </div>
+        <div style="flex:1;min-width:120px">
+          <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.4px;margin-bottom:4px">單字</div>
+          <div style="font-size:22px;font-weight:700;color:#5b9bd5">${vDone} <span style="font-size:13px;color:var(--sub);font-weight:400">/ ${vAll}</span></div>
+          <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:6px 0">
+            <div style="width:${vPct}%;height:100%;background:#5b9bd5;border-radius:3px"></div>
+          </div>
+          <div style="font-size:11px;color:var(--sub)">完成度 ${vPct}%</div>
+        </div>
       </div>
-      <div style="font-size:11px;color:var(--sub)">整體文法完成度 ${pct}%</div>
-      <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
         ${['N5','N4','N3','N2','N1'].map(lv=>`
           <div style="flex:1;min-width:48px">
             <div style="font-size:10px;font-weight:700;color:${TC[lv]};margin-bottom:3px">${lv}</div>
@@ -3012,16 +3029,21 @@ function renderHome() {
         const aDone=songs.reduce((a,s)=>a+songDone(s),0);
         const aAll=songs.reduce((a,s)=>a+s.grammar.length,0);
         const aPct=aAll?Math.round(aDone/aAll*100):0;
+        const avDone=songs.reduce((a,s)=>a+songVocabDone(s),0);
+        const avAll=songs.reduce((a,s)=>a+(s.vocab||[]).length,0);
+        const avPct=avAll?Math.round(avDone/avAll*100):0;
         const grp=songs[0].group||'';
         const dist={N5:0,N4:0,N3:0,N2:0,N1:0};
         songs.forEach(s=>['N5','N4','N3','N2','N1'].forEach(lv=>{dist[lv]+=(s.distribution[lv]||0);}));
         const dTotal=Object.values(dist).reduce((a,b)=>a+b,0);
         return `<div class="ac" onclick="openArtistGroup('${artist.replace(/'/g,"\\'")}')" >
           <div class="ac-name">${artist}</div>
-          <div class="ac-meta">${grp}　${songs.length} 首歌・${aAll} 句型</div>
-          <div class="ac-pl"><span>文法進度</span><span>${aDone}/${aAll} (${aPct}%)</span></div>
+          <div class="ac-meta">${grp}　${songs.length} 首歌・${aAll} 句型・${avAll} 單字</div>
+          <div class="ac-pl"><span>文法</span><span>${aDone}/${aAll} (${aPct}%)</span></div>
           <div class="ac-pb"><div class="ac-pf" style="width:${aPct}%"></div></div>
-          <div class="ac-dist">${['N5','N4','N3','N2','N1'].map(lv=>
+          ${avAll?`<div class="ac-pl" style="margin-top:6px"><span>單字</span><span>${avDone}/${avAll} (${avPct}%)</span></div>
+          <div class="ac-pb"><div class="ac-pf" style="width:${avPct}%;background:#5b9bd5"></div></div>`:''}
+          <div class="ac-dist" style="margin-top:8px">${['N5','N4','N3','N2','N1'].map(lv=>
             `<span style="width:${dTotal?Math.round(dist[lv]/dTotal*100):0}%;background:${BC[lv]}" title="${lv}"></span>`
           ).join('')}</div>
         </div>`;
